@@ -8,6 +8,13 @@
  * ------------------------------------------------------------
  */{
   "sections": {
+    "enhanced_features": {
+      "type": "enhanced-product-features",
+      "settings": {
+        "padding-block-start": 0,
+        "padding-block-end": 20
+      }
+    },
     "main": {
       "type": "product-information",
       "blocks": {
@@ -897,7 +904,8 @@
     }
   },
   "order": [
-    "main",
+    "enhanced_features",
+    "main", 
     "product_recommendations_xmXAhw",
     "media_with_content_9rDKpN"
   ]
