@@ -1,0 +1,182 @@
+{%- comment -%}
+  SEO-optimized breadcrumbs with structured data
+  
+  Usage:
+  {% render 'breadcrumbs' %}
+{%- endcomment -%}
+
+{% liquid
+  assign breadcrumb_items = ''
+  assign breadcrumb_count = 0
+  
+  unless template == 'index'
+    assign breadcrumb_items = breadcrumb_items | append: '{"@type":"ListItem","position":1,"name":"Home","item":"' | append: shop.url | append: '"}'
+    assign breadcrumb_count = 1
+    
+    case template.name
+      when 'collection'
+        assign breadcrumb_count = breadcrumb_count | plus: 1
+        assign breadcrumb_items = breadcrumb_items | append: ',{"@type":"ListItem","position":' | append: breadcrumb_count | append: ',"name":"' | append: collection.title | escape | append: '","item":"' | append: shop.url | append: collection.url | append: '"}'
+        
+      when 'product'
+        if collection
+          assign breadcrumb_count = breadcrumb_count | plus: 1
+          assign breadcrumb_items = breadcrumb_items | append: ',{"@type":"ListItem","position":' | append: breadcrumb_count | append: ',"name":"' | append: collection.title | escape | append: '","item":"' | append: shop.url | append: collection.url | append: '"}'
+        endif
+        assign breadcrumb_count = breadcrumb_count | plus: 1
+        assign breadcrumb_items = breadcrumb_items | append: ',{"@type":"ListItem","position":' | append: breadcrumb_count | append: ',"name":"' | append: product.title | escape | append: '","item":"' | append: shop.url | append: product.url | append: '"}'
+        
+      when 'blog'
+        assign breadcrumb_count = breadcrumb_count | plus: 1
+        assign breadcrumb_items = breadcrumb_items | append: ',{"@type":"ListItem","position":' | append: breadcrumb_count | append: ',"name":"' | append: blog.title | escape | append: '","item":"' | append: shop.url | append: blog.url | append: '"}'
+        
+      when 'article'
+        assign breadcrumb_count = breadcrumb_count | plus: 1
+        assign breadcrumb_items = breadcrumb_items | append: ',{"@type":"ListItem","position":' | append: breadcrumb_count | append: ',"name":"' | append: blog.title | escape | append: '","item":"' | append: shop.url | append: blog.url | append: '"}'
+        assign breadcrumb_count = breadcrumb_count | plus: 1
+        assign breadcrumb_items = breadcrumb_items | append: ',{"@type":"ListItem","position":' | append: breadcrumb_count | append: ',"name":"' | append: article.title | escape | append: '","item":"' | append: shop.url | append: article.url | append: '"}'
+        
+      when 'page'
+        assign breadcrumb_count = breadcrumb_count | plus: 1
+        assign breadcrumb_items = breadcrumb_items | append: ',{"@type":"ListItem","position":' | append: breadcrumb_count | append: ',"name":"' | append: page.title | escape | append: '","item":"' | append: shop.url | append: page.url | append: '"}'
+    endcase
+  endunless
+%}
+
+{% if breadcrumb_count > 1 %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [{{ breadcrumb_items }}]
+  }
+  </script>
+
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <ol class="breadcrumbs__list">
+      <li class="breadcrumbs__item">
+        <a href="{{ routes.root_url }}" class="breadcrumbs__link">
+          <svg class="breadcrumbs__icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-4h4v4a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354l-6-6z"/>
+          </svg>
+          <span>Home</span>
+        </a>
+      </li>
+      
+      {% case template.name %}
+        {% when 'collection' %}
+          <li class="breadcrumbs__item breadcrumbs__item--current">
+            <span class="breadcrumbs__current">{{ collection.title }}</span>
+          </li>
+          
+        {% when 'product' %}
+          {% if collection %}
+            <li class="breadcrumbs__item">
+              <a href="{{ collection.url }}" class="breadcrumbs__link">{{ collection.title }}</a>
+            </li>
+          {% endif %}
+          <li class="breadcrumbs__item breadcrumbs__item--current">
+            <span class="breadcrumbs__current">{{ product.title }}</span>
+          </li>
+          
+        {% when 'blog' %}
+          <li class="breadcrumbs__item breadcrumbs__item--current">
+            <span class="breadcrumbs__current">{{ blog.title }}</span>
+          </li>
+          
+        {% when 'article' %}
+          <li class="breadcrumbs__item">
+            <a href="{{ blog.url }}" class="breadcrumbs__link">{{ blog.title }}</a>
+          </li>
+          <li class="breadcrumbs__item breadcrumbs__item--current">
+            <span class="breadcrumbs__current">{{ article.title }}</span>
+          </li>
+          
+        {% when 'page' %}
+          <li class="breadcrumbs__item breadcrumbs__item--current">
+            <span class="breadcrumbs__current">{{ page.title }}</span>
+          </li>
+      {% endcase %}
+    </ol>
+  </nav>
+
+  <style>
+    .breadcrumbs {
+      margin: var(--gap-md) 0;
+      padding: 0;
+    }
+    
+    .breadcrumbs__list {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      font-size: var(--font-size-sm);
+      gap: var(--gap-xs);
+    }
+    
+    .breadcrumbs__item {
+      display: flex;
+      align-items: center;
+    }
+    
+    .breadcrumbs__item:not(:last-child)::after {
+      content: '/';
+      margin: 0 var(--gap-xs);
+      color: var(--color-foreground);
+      opacity: 0.5;
+    }
+    
+    .breadcrumbs__link {
+      display: flex;
+      align-items: center;
+      gap: var(--gap-xs);
+      color: var(--color-foreground);
+      text-decoration: none;
+      transition: opacity 0.2s ease;
+    }
+    
+    .breadcrumbs__link:hover {
+      opacity: 0.7;
+      text-decoration: underline;
+    }
+    
+    .breadcrumbs__icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    
+    .breadcrumbs__current {
+      color: var(--color-foreground);
+      opacity: 0.7;
+      font-weight: 500;
+    }
+    
+    .breadcrumbs__item--current {
+      max-width: 200px;
+    }
+    
+    .breadcrumbs__current {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    @media (max-width: 767px) {
+      .breadcrumbs {
+        margin: var(--gap-sm) 0;
+      }
+      
+      .breadcrumbs__list {
+        font-size: var(--font-size-xs);
+      }
+      
+      .breadcrumbs__item--current {
+        max-width: 150px;
+      }
+    }
+  </style>
+{% endif %}

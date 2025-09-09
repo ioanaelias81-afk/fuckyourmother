@@ -1,0 +1,494 @@
+{% comment %}
+  Enhanced Mega Menu for Better Navigation
+  This section provides an advanced mega menu with featured collections and products
+{% endcomment %}
+
+{% liquid
+  assign main_menu = linklists[section.settings.menu] | default: linklists.main-menu
+  assign show_featured_products = section.settings.show_featured_products | default: true
+  assign featured_collection = collections[section.settings.featured_collection] | default: collections.featured
+%}
+
+<div class="mega-menu" data-mega-menu>
+  <nav class="mega-menu-nav" role="navigation" aria-label="Main navigation">
+    <ul class="mega-menu-list">
+      {% for link in main_menu.links %}
+        <li class="mega-menu-item{% if link.links != blank %} mega-menu-item--has-dropdown{% endif %}">
+          <a 
+            href="{{ link.url }}" 
+            class="mega-menu-link"
+            {% if link.links != blank %}
+              aria-expanded="false"
+              aria-haspopup="true"
+              data-mega-toggle
+            {% endif %}
+          >
+            {{ link.title }}
+            {% if link.links != blank %}
+              <svg class="mega-menu-arrow" width="12" height="12" viewBox="0 0 12 12" fill="currentColor">
+                <path d="M6 9L1.5 4.5L2.1 3.9L6 7.8L9.9 3.9L10.5 4.5L6 9Z"/>
+              </svg>
+            {% endif %}
+          </a>
+
+          {% if link.links != blank %}
+            <div class="mega-menu-dropdown" data-mega-dropdown>
+              <div class="mega-menu-dropdown-content">
+                <div class="mega-menu-links-section">
+                  <ul class="mega-menu-sublist">
+                    {% for child_link in link.links %}
+                      <li class="mega-menu-subitem">
+                        <a href="{{ child_link.url }}" class="mega-menu-sublink">
+                          {{ child_link.title }}
+                        </a>
+                        {% if child_link.links != blank %}
+                          <ul class="mega-menu-sub-sublist">
+                            {% for grandchild_link in child_link.links %}
+                              <li>
+                                <a href="{{ grandchild_link.url }}" class="mega-menu-sub-sublink">
+                                  {{ grandchild_link.title }}
+                                </a>
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        {% endif %}
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+
+                {% if show_featured_products and featured_collection and featured_collection.products.size > 0 %}
+                  <div class="mega-menu-featured-section">
+                    <h3 class="mega-menu-featured-title">Featured Products</h3>
+                    <div class="mega-menu-featured-grid">
+                      {% for product in featured_collection.products limit: 4 %}
+                        <div class="mega-menu-featured-item">
+                          <a href="{{ product.url }}" class="mega-menu-featured-link">
+                            <div class="mega-menu-featured-image">
+                              {% render 'image', 
+                                image: product.featured_image, 
+                                height: 120,
+                                class: 'mega-menu-product-image' %}
+                            </div>
+                            <div class="mega-menu-featured-content">
+                              <h4 class="mega-menu-featured-product-title">{{ product.title | truncate: 30 }}</h4>
+                              <div class="mega-menu-featured-price">
+                                {{ product.price | money }}
+                              </div>
+                            </div>
+                          </a>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  </nav>
+</div>
+
+<script>
+class MegaMenuManager {
+  constructor() {
+    this.activeDropdown = null;
+    this.init();
+  }
+
+  init() {
+    this.bindEvents();
+    this.setupAccessibility();
+  }
+
+  bindEvents() {
+    const toggles = document.querySelectorAll('[data-mega-toggle]');
+    
+    toggles.forEach(toggle => {
+      // Desktop hover events
+      const menuItem = toggle.closest('.mega-menu-item');
+      
+      menuItem.addEventListener('mouseenter', () => {
+        this.showDropdown(toggle);
+      });
+
+      menuItem.addEventListener('mouseleave', () => {
+        this.hideDropdown(toggle);
+      });
+
+      // Mobile click events
+      toggle.addEventListener('click', (e) => {
+        if (window.innerWidth <= 768) {
+          e.preventDefault();
+          this.toggleDropdown(toggle);
+        }
+      });
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.mega-menu-item')) {
+        this.hideAllDropdowns();
+      }
+    });
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 768) {
+        this.hideAllDropdowns();
+      }
+    });
+  }
+
+  setupAccessibility() {
+    const toggles = document.querySelectorAll('[data-mega-toggle]');
+    
+    toggles.forEach(toggle => {
+      toggle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.toggleDropdown(toggle);
+        } else if (e.key === 'Escape') {
+          this.hideDropdown(toggle);
+          toggle.focus();
+        }
+      });
+    });
+  }
+
+  showDropdown(toggle) {
+    const dropdown = toggle.nextElementSibling;
+    const menuItem = toggle.closest('.mega-menu-item');
+    
+    if (!dropdown) return;
+
+    // Hide other dropdowns
+    this.hideAllDropdowns();
+
+    // Show current dropdown
+    menuItem.classList.add('mega-menu-item--active');
+    toggle.setAttribute('aria-expanded', 'true');
+    dropdown.style.display = 'block';
+    
+    // Animate in
+    requestAnimationFrame(() => {
+      dropdown.classList.add('mega-menu-dropdown--show');
+    });
+
+    this.activeDropdown = { toggle, dropdown, menuItem };
+  }
+
+  hideDropdown(toggle) {
+    const dropdown = toggle.nextElementSibling;
+    const menuItem = toggle.closest('.mega-menu-item');
+    
+    if (!dropdown) return;
+
+    dropdown.classList.remove('mega-menu-dropdown--show');
+    toggle.setAttribute('aria-expanded', 'false');
+    menuItem.classList.remove('mega-menu-item--active');
+    
+    setTimeout(() => {
+      dropdown.style.display = 'none';
+    }, 200);
+
+    if (this.activeDropdown && this.activeDropdown.toggle === toggle) {
+      this.activeDropdown = null;
+    }
+  }
+
+  toggleDropdown(toggle) {
+    const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+    
+    if (isExpanded) {
+      this.hideDropdown(toggle);
+    } else {
+      this.showDropdown(toggle);
+    }
+  }
+
+  hideAllDropdowns() {
+    const allToggles = document.querySelectorAll('[data-mega-toggle]');
+    allToggles.forEach(toggle => {
+      if (toggle.getAttribute('aria-expanded') === 'true') {
+        this.hideDropdown(toggle);
+      }
+    });
+  }
+}
+
+// Initialize mega menu when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new MegaMenuManager();
+});
+</script>
+
+<style>
+.mega-menu {
+  position: relative;
+}
+
+.mega-menu-nav {
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.mega-menu-list {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.mega-menu-item {
+  position: relative;
+}
+
+.mega-menu-link {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs);
+  padding: var(--gap-md) var(--gap-lg);
+  color: var(--color-foreground);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-height: var(--touch-target-min);
+  white-space: nowrap;
+}
+
+.mega-menu-link:hover,
+.mega-menu-item--active > .mega-menu-link {
+  background: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.mega-menu-arrow {
+  transition: transform 0.2s ease;
+}
+
+.mega-menu-item--active .mega-menu-arrow {
+  transform: rotate(180deg);
+}
+
+.mega-menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-top: none;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  z-index: var(--z-dropdown);
+  min-width: 600px;
+  display: none;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.2s ease;
+}
+
+.mega-menu-dropdown--show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.mega-menu-dropdown-content {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--gap-xl);
+  padding: var(--gap-xl);
+}
+
+.mega-menu-sublist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 2;
+  column-gap: var(--gap-xl);
+}
+
+.mega-menu-subitem {
+  margin-bottom: var(--gap-md);
+  break-inside: avoid;
+}
+
+.mega-menu-sublink {
+  display: block;
+  color: var(--color-foreground);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--font-size-md);
+  padding: var(--gap-sm) 0;
+  transition: color 0.2s ease;
+}
+
+.mega-menu-sublink:hover {
+  color: var(--color-primary);
+}
+
+.mega-menu-sub-sublist {
+  list-style: none;
+  margin: var(--gap-sm) 0 0 var(--gap-md);
+  padding: 0;
+}
+
+.mega-menu-sub-sublink {
+  display: block;
+  color: var(--color-foreground);
+  opacity: 0.8;
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  padding: var(--gap-xs) 0;
+  transition: opacity 0.2s ease;
+}
+
+.mega-menu-sub-sublink:hover {
+  opacity: 1;
+  color: var(--color-primary);
+}
+
+.mega-menu-featured-section {
+  border-left: 1px solid var(--color-border);
+  padding-left: var(--gap-xl);
+}
+
+.mega-menu-featured-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  margin: 0 0 var(--gap-md);
+  color: var(--color-foreground);
+}
+
+.mega-menu-featured-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--gap-md);
+}
+
+.mega-menu-featured-item {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.mega-menu-featured-item:hover {
+  transform: translateY(-2px);
+}
+
+.mega-menu-featured-link {
+  display: block;
+  color: var(--color-foreground);
+  text-decoration: none;
+}
+
+.mega-menu-featured-image {
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+  border-radius: var(--border-radius-sm);
+  margin-bottom: var(--gap-sm);
+}
+
+.mega-menu-product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.mega-menu-featured-item:hover .mega-menu-product-image {
+  transform: scale(1.05);
+}
+
+.mega-menu-featured-product-title {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin: 0 0 var(--gap-xs);
+  line-height: 1.3;
+  color: var(--color-foreground);
+}
+
+.mega-menu-featured-price {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* Mobile Styles */
+@media (max-width: 768px) {
+  .mega-menu-list {
+    flex-direction: column;
+  }
+
+  .mega-menu-dropdown {
+    position: static;
+    min-width: auto;
+    box-shadow: none;
+    border: none;
+    background: var(--color-background);
+  }
+
+  .mega-menu-dropdown-content {
+    grid-template-columns: 1fr;
+    gap: var(--gap-lg);
+    padding: var(--gap-md) var(--gap-lg);
+  }
+
+  .mega-menu-sublist {
+    columns: 1;
+  }
+
+  .mega-menu-featured-section {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+    padding-left: 0;
+    padding-top: var(--gap-lg);
+  }
+
+  .mega-menu-featured-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet adjustments */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .mega-menu-dropdown {
+    min-width: 500px;
+  }
+
+  .mega-menu-dropdown-content {
+    grid-template-columns: 1fr 250px;
+    gap: var(--gap-lg);
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Mega Menu",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_featured_products",
+      "label": "Show featured products in dropdown",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "featured_collection",
+      "label": "Featured collection",
+      "info": "Products from this collection will be shown in the mega menu dropdown"
+    }
+  ]
+}
+{% endschema %}

@@ -12,12 +12,58 @@ body {
 }
 
 :root {
+  /* ===== HOVER EFFECTS ===== */
   --hover-lift-amount: 4px;
   --hover-scale-amount: 1.03;
   --hover-subtle-zoom-amount: 1.015;
   --hover-shadow-color: var(--color-shadow);
   --hover-transition-duration: 0.25s;
   --hover-transition-timing: ease-out;
+
+  /* ===== COMPREHENSIVE SPACING SYSTEM ===== */
+  --gap-xs: 4px;
+  --gap-sm: 8px;
+  --gap-md: 16px;
+  --gap-lg: 24px;
+  --gap-xl: 32px;
+  --gap-2xl: 48px;
+  --gap-3xl: 64px;
+  --gap-4xl: 96px;
+
+  /* ===== TYPOGRAPHY SCALE ===== */
+  --font-size-xs: 0.75rem;      /* 12px */
+  --font-size-sm: 0.875rem;     /* 14px */
+  --font-size-base: 1rem;       /* 16px */
+  --font-size-md: 1.125rem;     /* 18px */
+  --font-size-lg: 1.25rem;      /* 20px */
+  --font-size-xl: 1.5rem;       /* 24px */
+  --font-size-2xl: 1.875rem;    /* 30px */
+  --font-size-3xl: 2.25rem;     /* 36px */
+  --font-size-4xl: 3rem;        /* 48px */
+  --font-size-5xl: 3.75rem;     /* 60px */
+
+  /* ===== MOBILE-OPTIMIZED TOUCH TARGETS ===== */
+  --touch-target-min: 44px;
+  --button-height-sm: var(--touch-target-min);
+  --button-height-md: 48px;
+  --button-height-lg: 56px;
+
+  /* ===== PERFORMANCE OPTIMIZATIONS ===== */
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-full: 50%;
+
+  /* ===== Z-INDEX SCALE ===== */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+  --z-notification: 1080;
 }
 
 html {
@@ -43,6 +89,34 @@ svg {
 img {
   width: 100%;
   height: auto;
+  /* Performance: Enable hardware acceleration for smooth animations */
+  transform: translateZ(0);
+  will-change: auto;
+}
+
+/* ===== LAZY LOADING OPTIMIZATION ===== */
+img[loading="lazy"] {
+  /* Optimize for lazy loading */
+  content-visibility: auto;
+  contain-intrinsic-size: 300px 200px;
+}
+
+/* ===== MODERN IMAGE FORMAT SUPPORT ===== */
+picture {
+  display: block;
+  width: 100%;
+}
+
+/* ===== PERFORMANCE-FIRST MEDIA QUERIES ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 input,

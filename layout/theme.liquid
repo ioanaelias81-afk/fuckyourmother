@@ -60,6 +60,13 @@
     <script src="{{ 'critical.js' | asset_url }}"></script>
     {% # theme-check-enable ParserBlockingScript %}
 
+    <!-- Performance and UX Enhancement Scripts -->
+    <script src="{{ 'mobile-ux.js' | asset_url }}" defer></script>
+    
+    <!-- Enhanced CSS for performance and design system -->
+    <link rel="stylesheet" href="{{ 'performance.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ 'performance.css' | asset_url }}"></noscript>
+
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}
     {% endif %}

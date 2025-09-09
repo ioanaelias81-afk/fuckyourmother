@@ -1,0 +1,334 @@
+{%- comment -%}
+  Newsletter signup with incentive for growth marketing
+  
+  Usage:
+  {% render 'newsletter-signup', 
+     title: 'Get 10% Off Your First Order', 
+     description: 'Subscribe to get special offers, free giveaways, and exclusive deals.',
+     incentive: '10% OFF',
+     style: 'modal' or 'inline' %}
+{%- endcomment -%}
+
+{% liquid
+  assign signup_title = title | default: 'Stay in the loop'
+  assign signup_description = description | default: 'Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.'
+  assign signup_incentive = incentive | default: ''
+  assign signup_style = style | default: 'inline'
+  assign form_id = 'newsletter-' | append: section.id | default: 'default'
+%}
+
+<div class="newsletter-signup newsletter-signup--{{ signup_style }}" data-newsletter-signup>
+  {% if signup_style == 'modal' %}
+    <div class="newsletter-signup__backdrop" data-newsletter-backdrop></div>
+  {% endif %}
+  
+  <div class="newsletter-signup__container">
+    {% if signup_style == 'modal' %}
+      <button class="newsletter-signup__close" data-newsletter-close aria-label="Close newsletter signup">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    {% endif %}
+    
+    <div class="newsletter-signup__content">
+      {% if signup_incentive != blank %}
+        <div class="newsletter-signup__incentive">{{ signup_incentive }}</div>
+      {% endif %}
+      
+      <h3 class="newsletter-signup__title">{{ signup_title }}</h3>
+      <p class="newsletter-signup__description">{{ signup_description }}</p>
+      
+      {% form 'customer', class: 'newsletter-signup__form', id: form_id %}
+        {% if form.posted_successfully? %}
+          <div class="newsletter-signup__success" data-success-message>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Thanks for subscribing! Check your email for your discount code.</span>
+          </div>
+        {% else %}
+          <div class="newsletter-signup__form-group">
+            <input 
+              type="email" 
+              name="contact[email]" 
+              class="newsletter-signup__input"
+              placeholder="Enter your email address"
+              required
+              autocomplete="email"
+              aria-label="Email address"
+            >
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <button type="submit" class="newsletter-signup__button">
+              Subscribe
+              <svg class="newsletter-signup__arrow" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                <path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/>
+              </svg>
+            </button>
+          </div>
+          
+          {% if form.errors %}
+            <div class="newsletter-signup__error">
+              {% for error in form.errors %}
+                <p>{{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endif %}
+      {% endform %}
+      
+      <div class="newsletter-signup__trust">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+        </svg>
+        <span>No spam, unsubscribe anytime</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  .newsletter-signup--inline {
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-lg);
+    padding: var(--gap-xl);
+    margin: var(--gap-2xl) 0;
+    text-align: center;
+  }
+  
+  .newsletter-signup--modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: var(--z-modal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .newsletter-signup--modal.active {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .newsletter-signup__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+  }
+  
+  .newsletter-signup--modal .newsletter-signup__container {
+    position: relative;
+    background: var(--color-background);
+    border-radius: var(--border-radius-lg);
+    padding: var(--gap-2xl);
+    max-width: 480px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+  }
+  
+  .newsletter-signup--modal.active .newsletter-signup__container {
+    transform: scale(1);
+  }
+  
+  .newsletter-signup__close {
+    position: absolute;
+    top: var(--gap-md);
+    right: var(--gap-md);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: var(--gap-sm);
+    color: var(--color-foreground);
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+  
+  .newsletter-signup__close:hover {
+    opacity: 1;
+  }
+  
+  .newsletter-signup__incentive {
+    display: inline-block;
+    background: var(--color-primary);
+    color: var(--color-background);
+    padding: var(--gap-sm) var(--gap-md);
+    border-radius: var(--border-radius-full);
+    font-weight: bold;
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--gap-md);
+  }
+  
+  .newsletter-signup__title {
+    font-size: var(--font-size-2xl);
+    font-weight: bold;
+    margin: 0 0 var(--gap-md);
+    color: var(--color-foreground);
+  }
+  
+  .newsletter-signup__description {
+    font-size: var(--font-size-md);
+    color: var(--color-foreground);
+    opacity: 0.8;
+    margin: 0 0 var(--gap-lg);
+    line-height: 1.5;
+  }
+  
+  .newsletter-signup__form-group {
+    display: flex;
+    gap: var(--gap-sm);
+    margin-bottom: var(--gap-md);
+  }
+  
+  .newsletter-signup__input {
+    flex: 1;
+    padding: var(--gap-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius-md);
+    font-size: var(--font-size-base);
+    background: var(--color-background);
+    color: var(--color-foreground);
+  }
+  
+  .newsletter-signup__input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+  }
+  
+  .newsletter-signup__button {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    background: var(--color-primary);
+    color: var(--color-background);
+    border: none;
+    border-radius: var(--border-radius-md);
+    padding: var(--gap-md) var(--gap-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    min-height: var(--touch-target-min);
+  }
+  
+  .newsletter-signup__button:hover {
+    background: var(--color-primary-hover);
+  }
+  
+  .newsletter-signup__success {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    background: var(--color-success, #10b981);
+    color: white;
+    padding: var(--gap-md);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--gap-md);
+  }
+  
+  .newsletter-signup__error {
+    background: var(--color-error, #ef4444);
+    color: white;
+    padding: var(--gap-md);
+    border-radius: var(--border-radius-md);
+    margin-top: var(--gap-sm);
+  }
+  
+  .newsletter-signup__trust {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--gap-sm);
+    font-size: var(--font-size-sm);
+    color: var(--color-foreground);
+    opacity: 0.6;
+    margin-top: var(--gap-md);
+  }
+  
+  @media (max-width: 767px) {
+    .newsletter-signup__form-group {
+      flex-direction: column;
+    }
+    
+    .newsletter-signup__title {
+      font-size: var(--font-size-xl);
+    }
+    
+    .newsletter-signup--modal .newsletter-signup__container {
+      padding: var(--gap-xl);
+      width: 95%;
+    }
+  }
+</style>
+
+<script>
+  // Newsletter popup functionality
+  (function() {
+    const newsletter = document.querySelector('[data-newsletter-signup]');
+    if (!newsletter || !newsletter.classList.contains('newsletter-signup--modal')) return;
+    
+    const backdrop = newsletter.querySelector('[data-newsletter-backdrop]');
+    const closeBtn = newsletter.querySelector('[data-newsletter-close]');
+    
+    // Show modal after delay (if not shown before)
+    const showDelay = 15000; // 15 seconds
+    const cookieName = 'newsletter_shown';
+    
+    if (!getCookie(cookieName)) {
+      setTimeout(() => {
+        newsletter.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }, showDelay);
+    }
+    
+    // Close handlers
+    const closeModal = () => {
+      newsletter.classList.remove('active');
+      document.body.style.overflow = '';
+      setCookie(cookieName, 'true', 30); // Don't show for 30 days
+    };
+    
+    if (backdrop) backdrop.addEventListener('click', closeModal);
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && newsletter.classList.contains('active')) {
+        closeModal();
+      }
+    });
+    
+    // Cookie helpers
+    function setCookie(name, value, days) {
+      const expires = new Date();
+      expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+      document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`;
+    }
+    
+    function getCookie(name) {
+      const nameEQ = name + "=";
+      const ca = document.cookie.split(';');
+      for (let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      }
+      return null;
+    }
+  })();
+</script>

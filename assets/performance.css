@@ -1,0 +1,232 @@
+/*
+ * ===== CRITICAL CSS - ABOVE THE FOLD STYLES =====
+ * This file contains performance-optimized styles for above-the-fold content
+ */
+
+/* ===== CRITICAL LAYOUT STYLES ===== */
+.header {
+  contain: layout;
+  will-change: transform;
+}
+
+.hero-section,
+.main-content {
+  contain: layout style;
+}
+
+/* ===== FONT LOADING OPTIMIZATION ===== */
+@font-face {
+  font-display: swap; /* Ensure text remains visible during webfont load */
+}
+
+/* ===== CRITICAL BUTTON STYLES ===== */
+.btn,
+button,
+[role="button"] {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  padding: var(--gap-sm) var(--gap-md);
+  border-radius: var(--border-radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  /* Ensure buttons are accessible on touch devices */
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* ===== MOBILE-FIRST RESPONSIVE DESIGN ===== */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--gap-md);
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 0 var(--gap-lg);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 var(--gap-xl);
+  }
+}
+
+/* ===== STICKY ADD TO CART BAR (MOBILE) ===== */
+.sticky-cart-mobile {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-background);
+  border-top: 1px solid var(--color-border);
+  padding: var(--gap-md);
+  z-index: var(--z-sticky);
+  transform: translateY(100%);
+  transition: transform 0.3s ease;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-cart-mobile.active {
+  transform: translateY(0);
+}
+
+@media (min-width: 768px) {
+  .sticky-cart-mobile {
+    display: none;
+  }
+}
+
+/* ===== SWIPEABLE CAROUSEL OPTIMIZATION ===== */
+.swiper-container {
+  touch-action: pan-y pinch-zoom;
+  overflow: hidden;
+}
+
+.swiper-slide {
+  flex-shrink: 0;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  scroll-snap-align: center;
+}
+
+/* ===== CAROUSEL CONTROLS ===== */
+.carousel-controls {
+  display: flex;
+  gap: var(--gap-sm);
+  justify-content: center;
+  margin-top: var(--gap-md);
+}
+
+.carousel-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: var(--border-radius-full);
+  background: var(--color-foreground);
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.carousel-dot::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: var(--border-radius-full);
+  background: currentColor;
+}
+
+.carousel-dot.active {
+  opacity: 1;
+}
+
+.carousel-arrow {
+  width: var(--touch-target-min);
+  height: var(--touch-target-min);
+  border-radius: var(--border-radius-full);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-dropdown);
+}
+
+.carousel-arrow:hover {
+  background: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.carousel-arrow--prev {
+  left: var(--gap-md);
+}
+
+.carousel-arrow--next {
+  right: var(--gap-md);
+}
+
+/* ===== TRUST BADGES ENHANCEMENT ===== */
+.trust-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-md);
+  align-items: center;
+  margin: var(--gap-lg) 0;
+}
+
+.trust-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  padding: var(--gap-sm) var(--gap-md);
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-foreground);
+}
+
+.trust-badge svg,
+.trust-badge img {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
+/* ===== SOCIAL PROOF WIDGETS ===== */
+.social-proof {
+  position: relative;
+  padding: var(--gap-sm) var(--gap-md);
+  background: var(--color-primary);
+  color: var(--color-background);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-sm);
+  margin: var(--gap-md) 0;
+  animation: slideInUp 0.5s ease;
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ===== PERFORMANCE UTILITIES ===== */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 300px;
+}
+
+/* ===== CRITICAL PATH OPTIMIZATIONS ===== */
+.above-fold {
+  contain: layout style paint;
+}
+
+.below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: 500px;
+}
