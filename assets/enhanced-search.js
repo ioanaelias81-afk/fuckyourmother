@@ -269,16 +269,25 @@ class EnhancedPredictiveSearch {
       recent.innerHTML = `
         <h3>Recent Searches</h3>
         <div class="search-history">
-          ${this.searchHistory.slice(0, 5).map(term => `
-            <button class="search-history-item" data-search-term="${term}">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-                <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm3.5-9L9 8.5l1.5 1.5-.5.5L8.5 9 7 10.5 6.5 10l1.5-1.5L6.5 7 7 6.5 8.5 8 10 6.5l.5.5z"/>
-              </svg>
-              ${term}
-            </button>
-          `).join('')}
         </div>
       `;
+      
+      const historyContainer = recent.querySelector('.search-history');
+      this.searchHistory.slice(0, 5).forEach(term => {
+        const button = document.createElement('button');
+        button.className = 'search-history-item';
+        button.setAttribute('data-search-term', term);
+        
+        button.innerHTML = `
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm3.5-9L9 8.5l1.5 1.5-.5.5L8.5 9 7 10.5 6.5 10l1.5-1.5L6.5 7 7 6.5 8.5 8 10 6.5l.5.5z"/>
+          </svg>
+        `;
+        
+        const textNode = document.createTextNode(term);
+        button.appendChild(textNode);
+        historyContainer.appendChild(button);
+      });
     }
 
     // Popular searches (hardcoded for demo, could be dynamic)
