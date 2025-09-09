@@ -565,7 +565,7 @@ class FacetStatusComponent extends Component {
     }
 
     if (checkedInputElementsCount > 3) {
-      facetStatus.innerHTML = checkedInputElementsCount.toString();
+      facetStatus.textContent = checkedInputElementsCount.toString();
       facetStatus.classList.add('bubble', 'facets__bubble');
       return;
     }
@@ -593,11 +593,11 @@ class FacetStatusComponent extends Component {
     }
 
     if (checkedInputElementsCount === 1) {
-      facetStatus.innerHTML = checkedInputElements[0]?.dataset.label ?? '';
+      facetStatus.textContent = checkedInputElements[0]?.dataset.label ?? '';
       return;
     }
 
-    facetStatus.innerHTML = checkedInputElementsCount.toString();
+    facetStatus.textContent = checkedInputElementsCount.toString();
     facetStatus.classList.add('bubble', 'facets__bubble');
   }
 
