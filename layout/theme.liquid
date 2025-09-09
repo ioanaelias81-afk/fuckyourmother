@@ -32,14 +32,37 @@
       {%- render 'theme-editor' -%}
     {% endif %}
 
+    <!-- Performance Optimizations -->
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
+    <!-- Critical CSS -->
+    <link rel="stylesheet" href="{{ 'accessibility-enhancements.css' | asset_url }}" data-critical>
+    
+    <!-- Performance Monitoring -->
+    {% if settings.enable_performance_monitoring %}
+      <script>
+        window.PERFORMANCE_ENDPOINT = {{ settings.performance_analytics_endpoint | json }};
+      </script>
+    {% endif %}
+
     {{ content_for_header }}
   </head>
 
-  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
-    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+  <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}"
+        data-template="{{ template.name }}"
+        {% if settings.enable_reduced_motion_default %}data-reduce-motion="true"{% endif %}
+        {% if settings.cognitive_load_level %}data-cognitive-load="{{ settings.cognitive_load_level }}"{% endif %}>
     
-    <!-- Neurodiverse Accessibility Controls -->
-    {% render 'accessibility-controls' %}
+    <!-- Skip Links for Accessibility -->
+    {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+    <a href="#footer" class="skip-to-content-link">Skip to footer</a>
+    
+    <!-- Accessibility Controls -->
+    {% if settings.enable_accessibility_controls %}
+      {% render 'accessibility-controls' %}
+    {% endif %}
     
     <div id="header-group">
       {% sections 'header-group' %}
@@ -58,23 +81,33 @@
 
     {% sections 'footer-group' %}
 
+    <!-- Personalization Engine -->
+    {% if settings.enable_personalized_recommendations or settings.enable_recently_viewed %}
+      {% render 'personalization-engine' %}
+    {% endif %}
+
     {% render 'search-modal' %}
 
-    {% # theme-check-disable ParserBlockingScript %}
+    <!-- Critical JavaScript -->
+    {% comment %} theme-check-disable ParserBlockingScript {% endcomment %}
     <script src="{{ 'critical.js' | asset_url }}"></script>
-    {% # theme-check-enable ParserBlockingScript %}
+    {% comment %} theme-check-enable ParserBlockingScript {% endcomment %}
 
-    <!-- Performance and UX Enhancement Scripts -->
+    <!-- Performance and Asset Optimization -->
+    <script src="{{ 'asset-optimizer.js' | asset_url }}" type="module" defer></script>
+    
+    <!-- Performance Monitoring -->
+    {% if settings.enable_performance_monitoring %}
+      <script src="{{ 'performance-monitor.js' | asset_url }}" type="module" defer></script>
+    {% endif %}
+
+    <!-- Enhanced UX Scripts -->
     <script src="{{ 'mobile-ux.js' | asset_url }}" defer></script>
     <script src="{{ 'enhanced-search.js' | asset_url }}" defer></script>
     
-    <!-- Enhanced CSS for performance and design system -->
-    <link rel="stylesheet" href="{{ 'performance.css' | asset_url }}" media="print" onload="this.media='all'">
+    <!-- Deferred CSS for Better Performance -->
+    <link rel="preload" href="{{ 'performance.css' | asset_url }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="{{ 'performance.css' | asset_url }}"></noscript>
-    
-    <!-- Neurodiverse-friendly enhancements -->
-    <link rel="stylesheet" href="{{ 'neurodiverse-enhancements.css' | asset_url }}" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="{{ 'neurodiverse-enhancements.css' | asset_url }}"></noscript>
 
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}

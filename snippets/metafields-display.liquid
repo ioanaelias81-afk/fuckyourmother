@@ -1,0 +1,327 @@
+{%- doc -%}
+  Flexible metafields display for products, collections, and other resources
+  
+  @param {object} resource - The resource object (product, collection, etc.)
+  @param {string} namespace - Metafield namespace
+  @param {string} key - Metafield key
+  @param {string} [type] - Display type (text, list, image, etc.)
+  @param {string} [class] - Additional CSS classes
+  @param {string} [label] - Custom label for the metafield
+  
+  @example
+  {% render 'metafields-display', 
+     resource: product, 
+     namespace: 'custom', 
+     key: 'specifications',
+     type: 'list',
+     label: 'Product Specifications' %}
+{%- enddoc -%}
+
+{%- liquid
+  assign metafield = resource.metafields[namespace][key]
+  assign display_type = type | default: 'text'
+  assign field_label = label | default: key | replace: '_', ' ' | capitalize
+-%}
+
+{%- if metafield != blank -%}
+  <div class="metafield-display metafield-display--{{ display_type }} {{ class }}"
+       data-metafield-namespace="{{ namespace }}"
+       data-metafield-key="{{ key }}">
+    
+    {%- if label != 'none' -%}
+      <{{ heading_level | default: 'h3' }} class="metafield-label">
+        {{ field_label }}
+      </{{ heading_level | default: 'h3' }}>
+    {%- endif -%}
+    
+    <div class="metafield-value">
+      {%- case display_type -%}
+        
+        {%- when 'text' -%}
+          <p class="metafield-text">{{ metafield.value }}</p>
+        
+        {%- when 'rich_text' -%}
+          <div class="metafield-rich-text">{{ metafield.value }}</div>
+        
+        {%- when 'list' -%}
+          {%- assign list_items = metafield.value | split: ',' -%}
+          <ul class="metafield-list">
+            {%- for item in list_items -%}
+              <li class="metafield-list-item">{{ item | strip }}</li>
+            {%- endfor -%}
+          </ul>
+        
+        {%- when 'image' -%}
+          {%- if metafield.value -%}
+            {% render 'image-optimized',
+               image: metafield.value,
+               alt: field_label,
+               class: 'metafield-image',
+               sizes: '(min-width: 750px) 33vw, 50vw' %}
+          {%- endif -%}
+        
+        {%- when 'gallery' -%}
+          {%- assign images = metafield.value -%}
+          {%- if images.size > 0 -%}
+            <div class="metafield-gallery">
+              {%- for image in images -%}
+                <div class="metafield-gallery-item">
+                  {% render 'image-optimized',
+                     image: image,
+                     alt: field_label | append: ' ' | append: forloop.index,
+                     class: 'metafield-gallery-image',
+                     sizes: '(min-width: 750px) 25vw, 50vw' %}
+                </div>
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
+        
+        {%- when 'url' -%}
+          <a href="{{ metafield.value }}" 
+             class="metafield-link"
+             target="_blank" 
+             rel="noopener noreferrer">
+            {{ metafield.value }}
+          </a>
+        
+        {%- when 'email' -%}
+          <a href="mailto:{{ metafield.value }}" class="metafield-email">
+            {{ metafield.value }}
+          </a>
+        
+        {%- when 'phone' -%}
+          <a href="tel:{{ metafield.value }}" class="metafield-phone">
+            {{ metafield.value }}
+          </a>
+        
+        {%- when 'date' -%}
+          <time class="metafield-date" datetime="{{ metafield.value }}">
+            {{ metafield.value | date: '%B %d, %Y' }}
+          </time>
+        
+        {%- when 'json' -%}
+          {%- assign json_data = metafield.value | parse_json -%}
+          <div class="metafield-json" data-json="{{ metafield.value | escape }}">
+            {%- for item in json_data -%}
+              <div class="json-item">
+                <strong>{{ item[0] | capitalize }}:</strong> {{ item[1] }}
+              </div>
+            {%- endfor -%}
+          </div>
+        
+        {%- when 'rating' -%}
+          {%- assign rating = metafield.value | plus: 0 -%}
+          <div class="metafield-rating" role="img" aria-label="{{ rating }} out of 5 stars">
+            <div class="rating-stars">
+              {%- for i in (1..5) -%}
+                <span class="rating-star {% if i <= rating %}rating-star--filled{% endif %}"
+                      aria-hidden="true">★</span>
+              {%- endfor -%}
+            </div>
+            <span class="rating-value sr-only">{{ rating }} out of 5</span>
+          </div>
+        
+        {%- when 'color' -%}
+          <div class="metafield-color">
+            <span class="color-swatch" 
+                  style="background-color: {{ metafield.value }};"
+                  aria-label="Color: {{ metafield.value }}"></span>
+            <span class="color-value">{{ metafield.value }}</span>
+          </div>
+        
+        {%- when 'dimension' -%}
+          <div class="metafield-dimension">
+            {{ metafield.value }} {{ metafield.unit | default: 'cm' }}
+          </div>
+        
+        {%- when 'weight' -%}
+          <div class="metafield-weight">
+            {{ metafield.value }} {{ metafield.unit | default: 'kg' }}
+          </div>
+        
+        {%- when 'boolean' -%}
+          <div class="metafield-boolean">
+            {%- if metafield.value -%}
+              <span class="boolean-true">✓ Yes</span>
+            {%- else -%}
+              <span class="boolean-false">✗ No</span>
+            {%- endif -%}
+          </div>
+        
+        {%- when 'product_reference' -%}
+          {%- assign referenced_product = metafield.value -%}
+          {%- if referenced_product -%}
+            <div class="metafield-product-reference">
+              <a href="{{ referenced_product.url }}" class="referenced-product">
+                {%- if referenced_product.featured_image -%}
+                  {% render 'image-optimized',
+                     image: referenced_product.featured_image,
+                     width: 100,
+                     alt: referenced_product.title,
+                     class: 'referenced-product-image' %}
+                {%- endif -%}
+                <span class="referenced-product-title">{{ referenced_product.title }}</span>
+              </a>
+            </div>
+          {%- endif -%}
+        
+        {%- when 'collection_reference' -%}
+          {%- assign referenced_collection = metafield.value -%}
+          {%- if referenced_collection -%}
+            <div class="metafield-collection-reference">
+              <a href="{{ referenced_collection.url }}" class="referenced-collection">
+                {%- if referenced_collection.featured_image -%}
+                  {% render 'image-optimized',
+                     image: referenced_collection.featured_image,
+                     width: 100,
+                     alt: referenced_collection.title,
+                     class: 'referenced-collection-image' %}
+                {%- endif -%}
+                <span class="referenced-collection-title">{{ referenced_collection.title }}</span>
+              </a>
+            </div>
+          {%- endif -%}
+        
+        {%- else -%}
+          <div class="metafield-default">{{ metafield.value }}</div>
+      
+      {%- endcase -%}
+    </div>
+  </div>
+{%- endif -%}
+
+<style>
+.metafield-display {
+  margin-bottom: var(--gap-md, 16px);
+}
+
+.metafield-label {
+  font-weight: 600;
+  margin-bottom: var(--gap-sm, 8px);
+  color: var(--color-foreground);
+}
+
+.metafield-value {
+  line-height: 1.5;
+}
+
+.metafield-list {
+  list-style: none;
+  padding: 0;
+}
+
+.metafield-list-item {
+  padding: var(--gap-xs, 4px) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.metafield-list-item:last-child {
+  border-bottom: none;
+}
+
+.metafield-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: var(--gap-md, 16px);
+}
+
+.metafield-gallery-image {
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius-md, 8px);
+}
+
+.metafield-link,
+.metafield-email,
+.metafield-phone {
+  color: var(--color-link, #0066cc);
+  text-decoration: underline;
+}
+
+.metafield-rating {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm, 8px);
+}
+
+.rating-stars {
+  display: flex;
+  gap: 2px;
+}
+
+.rating-star {
+  color: #ddd;
+  font-size: 1.2em;
+}
+
+.rating-star--filled {
+  color: #ffa500;
+}
+
+.metafield-color {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm, 8px);
+}
+
+.color-swatch {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--color-border);
+  display: inline-block;
+}
+
+.metafield-boolean .boolean-true {
+  color: var(--color-success, #28a745);
+  font-weight: 600;
+}
+
+.metafield-boolean .boolean-false {
+  color: var(--color-error, #dc3545);
+  font-weight: 600;
+}
+
+.referenced-product,
+.referenced-collection {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm, 8px);
+  text-decoration: none;
+  color: var(--color-foreground);
+  padding: var(--gap-sm, 8px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md, 8px);
+  transition: border-color 0.2s ease;
+}
+
+.referenced-product:hover,
+.referenced-collection:hover {
+  border-color: var(--color-primary);
+}
+
+.referenced-product-image,
+.referenced-collection-image {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: var(--border-radius-sm, 4px);
+}
+
+.metafield-json .json-item {
+  padding: var(--gap-xs, 4px) 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 749px) {
+  .metafield-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .referenced-product,
+  .referenced-collection {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+</style>

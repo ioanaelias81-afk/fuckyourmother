@@ -1,0 +1,553 @@
+{%- doc -%}
+  Personalization engine for showing relevant content based on user behavior
+  Includes recently viewed products, recommendations, and dynamic content
+{%- enddoc -%}
+
+<div class="personalization-engine" data-personalization-engine>
+  <!-- Recently Viewed Products -->
+  <div class="recently-viewed-products" data-recently-viewed style="display: none;">
+    <h3 class="recently-viewed-title">Recently Viewed</h3>
+    <div class="recently-viewed-grid" data-recently-viewed-grid></div>
+  </div>
+
+  <!-- Personalized Recommendations -->
+  <div class="personalized-recommendations" data-recommendations style="display: none;">
+    <h3 class="recommendations-title">Recommended for You</h3>
+    <div class="recommendations-grid" data-recommendations-grid></div>
+  </div>
+
+  <!-- Browsing History -->
+  <div class="browsing-categories" data-browsing-categories style="display: none;">
+    <h3 class="browsing-title">Continue Exploring</h3>
+    <div class="browsing-grid" data-browsing-grid></div>
+  </div>
+</div>
+
+<script>
+class PersonalizationEngine {
+  constructor() {
+    this.maxRecentItems = 8;
+    this.maxRecommendations = 6;
+    this.maxBrowsingCategories = 4;
+    this.sessionData = this.getSessionData();
+    this.persistentData = this.getPersistentData();
+    this.init();
+  }
+
+  init() {
+    this.trackCurrentPage();
+    this.displayRecentlyViewed();
+    this.displayRecommendations();
+    this.displayBrowsingCategories();
+    this.setupEventListeners();
+  }
+
+  getSessionData() {
+    try {
+      return JSON.parse(sessionStorage.getItem('shopify_personalization') || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  getPersistentData() {
+    try {
+      return JSON.parse(localStorage.getItem('shopify_personalization') || '{}');
+    } catch (e) {
+      return {};
+    }
+  }
+
+  saveSessionData() {
+    try {
+      sessionStorage.setItem('shopify_personalization', JSON.stringify(this.sessionData));
+    } catch (e) {
+      console.warn('Failed to save session data');
+    }
+  }
+
+  savePersistentData() {
+    try {
+      localStorage.setItem('shopify_personalization', JSON.stringify(this.persistentData));
+    } catch (e) {
+      console.warn('Failed to save persistent data');
+    }
+  }
+
+  trackCurrentPage() {
+    const page = this.getCurrentPageData();
+    if (!page) return;
+
+    // Track in session for this visit
+    if (!this.sessionData.pages) this.sessionData.pages = [];
+    this.sessionData.pages.unshift(page);
+    this.sessionData.pages = this.sessionData.pages.slice(0, 20); // Keep last 20 pages
+
+    // Track persistently for recommendations
+    if (!this.persistentData.history) this.persistentData.history = [];
+    
+    // Remove duplicate if exists
+    this.persistentData.history = this.persistentData.history.filter(
+      item => !(item.type === page.type && item.id === page.id)
+    );
+    
+    this.persistentData.history.unshift(page);
+    this.persistentData.history = this.persistentData.history.slice(0, 50); // Keep last 50 items
+
+    this.saveSessionData();
+    this.savePersistentData();
+  }
+
+  getCurrentPageData() {
+    const templateName = window.Shopify?.template?.name;
+    const templateSuffix = window.Shopify?.template?.suffix;
+    
+    switch (templateName) {
+      case 'product':
+        return this.getProductData();
+      case 'collection':
+        return this.getCollectionData();
+      case 'article':
+        return this.getArticleData();
+      default:
+        return null;
+    }
+  }
+
+  getProductData() {
+    const productData = window.ShopifyAnalytics?.meta?.product;
+    if (!productData) return null;
+
+    return {
+      type: 'product',
+      id: productData.id,
+      title: productData.title,
+      vendor: productData.vendor,
+      type_name: productData.type,
+      tags: productData.tags || [],
+      price: productData.price,
+      image: productData.image,
+      url: window.location.pathname,
+      timestamp: Date.now()
+    };
+  }
+
+  getCollectionData() {
+    const collectionData = window.ShopifyAnalytics?.meta?.collection;
+    if (!collectionData) return null;
+
+    return {
+      type: 'collection',
+      id: collectionData.id,
+      title: collectionData.title,
+      url: window.location.pathname,
+      timestamp: Date.now()
+    };
+  }
+
+  getArticleData() {
+    const articleData = window.ShopifyAnalytics?.meta?.article;
+    if (!articleData) return null;
+
+    return {
+      type: 'article',
+      id: articleData.id,
+      title: articleData.title,
+      author: articleData.author,
+      tags: articleData.tags || [],
+      url: window.location.pathname,
+      timestamp: Date.now()
+    };
+  }
+
+  displayRecentlyViewed() {
+    const recentProducts = this.getRecentProducts();
+    if (recentProducts.length === 0) return;
+
+    const container = document.querySelector('[data-recently-viewed]');
+    const grid = document.querySelector('[data-recently-viewed-grid]');
+    
+    if (!container || !grid) return;
+
+    this.fetchProductDetails(recentProducts.map(p => p.id))
+      .then(products => {
+        grid.innerHTML = products.map(product => this.renderProductCard(product)).join('');
+        container.style.display = 'block';
+        this.setupProductCardEvents(grid);
+      })
+      .catch(err => console.warn('Failed to load recent products:', err));
+  }
+
+  getRecentProducts() {
+    if (!this.persistentData.history) return [];
+    
+    return this.persistentData.history
+      .filter(item => item.type === 'product')
+      .slice(0, this.maxRecentItems);
+  }
+
+  displayRecommendations() {
+    const recommendations = this.generateRecommendations();
+    if (recommendations.length === 0) return;
+
+    const container = document.querySelector('[data-recommendations]');
+    const grid = document.querySelector('[data-recommendations-grid]');
+    
+    if (!container || !grid) return;
+
+    this.fetchProductDetails(recommendations)
+      .then(products => {
+        grid.innerHTML = products.map(product => this.renderProductCard(product)).join('');
+        container.style.display = 'block';
+        this.setupProductCardEvents(grid);
+      })
+      .catch(err => console.warn('Failed to load recommendations:', err));
+  }
+
+  generateRecommendations() {
+    if (!this.persistentData.history) return [];
+
+    const recentProducts = this.persistentData.history.filter(item => item.type === 'product');
+    if (recentProducts.length === 0) return [];
+
+    // Get tags and vendors from recent products
+    const tags = new Set();
+    const vendors = new Set();
+    const types = new Set();
+
+    recentProducts.forEach(product => {
+      if (product.tags) product.tags.forEach(tag => tags.add(tag));
+      if (product.vendor) vendors.add(product.vendor);
+      if (product.type_name) types.add(product.type_name);
+    });
+
+    // This would typically be replaced with actual recommendation API calls
+    // For now, we'll return empty array as we'd need product data
+    return [];
+  }
+
+  displayBrowsingCategories() {
+    const categories = this.getBrowsingCategories();
+    if (categories.length === 0) return;
+
+    const container = document.querySelector('[data-browsing-categories]');
+    const grid = document.querySelector('[data-browsing-grid]');
+    
+    if (!container || !grid) return;
+
+    grid.innerHTML = categories.map(category => this.renderCategoryCard(category)).join('');
+    container.style.display = 'block';
+  }
+
+  getBrowsingCategories() {
+    if (!this.persistentData.history) return [];
+    
+    const categories = this.persistentData.history
+      .filter(item => item.type === 'collection')
+      .slice(0, this.maxBrowsingCategories);
+    
+    return categories;
+  }
+
+  fetchProductDetails(productIds) {
+    if (productIds.length === 0) return Promise.resolve([]);
+
+    // Create a batch request for product details
+    const promises = productIds.map(id => {
+      return fetch(`/products/${id}.js`)
+        .then(response => response.json())
+        .catch(err => {
+          console.warn(`Failed to fetch product ${id}:`, err);
+          return null;
+        });
+    });
+
+    return Promise.all(promises).then(products => products.filter(p => p));
+  }
+
+  renderProductCard(product) {
+    const imageUrl = product.featured_image ? 
+      `${product.featured_image}?width=300` : 
+      '/assets/no-image.svg';
+
+    const price = this.formatPrice(product.price);
+    const comparePrice = product.compare_at_price && product.compare_at_price > product.price ?
+      this.formatPrice(product.compare_at_price) : '';
+
+    return `
+      <div class="personalized-product-card" data-product-id="${product.id}">
+        <a href="${product.url}" class="product-link">
+          <div class="product-image-wrapper">
+            <img src="${imageUrl}" 
+                 alt="${product.title}" 
+                 class="product-image"
+                 loading="lazy"
+                 decoding="async">
+          </div>
+          <div class="product-info">
+            <h4 class="product-title">${product.title}</h4>
+            <div class="product-vendor">${product.vendor || ''}</div>
+            <div class="product-price">
+              ${comparePrice ? `<span class="compare-price">${comparePrice}</span>` : ''}
+              <span class="price">${price}</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    `;
+  }
+
+  renderCategoryCard(category) {
+    return `
+      <div class="personalized-category-card">
+        <a href="${category.url}" class="category-link">
+          <div class="category-info">
+            <h4 class="category-title">${category.title}</h4>
+            <span class="category-cta">Continue browsing</span>
+          </div>
+        </a>
+      </div>
+    `;
+  }
+
+  setupProductCardEvents(container) {
+    const productCards = container.querySelectorAll('.personalized-product-card');
+    productCards.forEach(card => {
+      card.addEventListener('click', (e) => {
+        const productId = card.dataset.productId;
+        this.trackInteraction('product_click', { productId });
+      });
+    });
+  }
+
+  trackInteraction(event, data) {
+    // Track user interactions for better recommendations
+    if (!this.sessionData.interactions) this.sessionData.interactions = [];
+    
+    this.sessionData.interactions.push({
+      event,
+      data,
+      timestamp: Date.now()
+    });
+    
+    this.saveSessionData();
+  }
+
+  formatPrice(cents) {
+    const currency = window.Shopify?.currency?.active || 'USD';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: currency
+    }).format(cents / 100);
+  }
+
+  setupEventListeners() {
+    // Track add to cart events
+    document.addEventListener('cart:add', (e) => {
+      this.trackInteraction('add_to_cart', e.detail);
+    });
+
+    // Track search events
+    document.addEventListener('search:performed', (e) => {
+      this.trackInteraction('search', e.detail);
+    });
+  }
+
+  // Public API methods
+  clearHistory() {
+    this.persistentData = {};
+    this.sessionData = {};
+    this.savePersistentData();
+    this.saveSessionData();
+    
+    // Hide all personalization sections
+    document.querySelectorAll('[data-recently-viewed], [data-recommendations], [data-browsing-categories]')
+      .forEach(el => el.style.display = 'none');
+  }
+
+  getPersonalizationData() {
+    return {
+      session: this.sessionData,
+      persistent: this.persistentData
+    };
+  }
+}
+
+// Initialize personalization engine
+document.addEventListener('DOMContentLoaded', () => {
+  window.personalizationEngine = new PersonalizationEngine();
+});
+</script>
+
+<style>
+.personalization-engine {
+  margin: var(--gap-lg, 24px) 0;
+}
+
+.recently-viewed-products,
+.personalized-recommendations,
+.browsing-categories {
+  margin-bottom: var(--gap-xl, 32px);
+}
+
+.recently-viewed-title,
+.recommendations-title,
+.browsing-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: var(--gap-md, 16px);
+  color: var(--color-foreground);
+}
+
+.recently-viewed-grid,
+.recommendations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--gap-lg, 24px);
+}
+
+.browsing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--gap-md, 16px);
+}
+
+.personalized-product-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md, 8px);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.personalized-product-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.product-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-image-wrapper {
+  aspect-ratio: 1;
+  overflow: hidden;
+}
+
+.product-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.personalized-product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-info {
+  padding: var(--gap-md, 16px);
+}
+
+.product-title {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 0 0 var(--gap-xs, 4px) 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-vendor {
+  font-size: 0.875rem;
+  color: var(--color-foreground-muted, #666);
+  margin-bottom: var(--gap-sm, 8px);
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-xs, 4px);
+}
+
+.compare-price {
+  text-decoration: line-through;
+  color: var(--color-foreground-muted, #666);
+  font-size: 0.875rem;
+}
+
+.price {
+  font-weight: 600;
+  color: var(--color-price, var(--color-foreground));
+}
+
+.personalized-category-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md, 8px);
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.personalized-category-card:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(var(--color-primary-rgb), 0.05);
+}
+
+.category-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+  padding: var(--gap-lg, 24px);
+}
+
+.category-title {
+  font-size: 1.125rem;
+  font-weight: 500;
+  margin: 0 0 var(--gap-sm, 8px) 0;
+}
+
+.category-cta {
+  color: var(--color-primary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Responsive adjustments */
+@media (max-width: 749px) {
+  .recently-viewed-grid,
+  .recommendations-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--gap-md, 16px);
+  }
+  
+  .browsing-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .product-info {
+    padding: var(--gap-sm, 8px);
+  }
+  
+  .product-title {
+    font-size: 0.875rem;
+  }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  .personalized-product-card,
+  .product-image {
+    transition: none;
+  }
+  
+  .personalized-product-card:hover {
+    transform: none;
+  }
+  
+  .personalized-product-card:hover .product-image {
+    transform: none;
+  }
+}
+</style>
