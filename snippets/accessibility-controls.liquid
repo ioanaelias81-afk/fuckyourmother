@@ -1,0 +1,615 @@
+{%- comment -%}
+  Neurodiverse Accessibility Controls
+  Provides user-controlled customizations for cognitive and sensory needs
+{%- endcomment -%}
+
+<div class="accessibility-controls" data-accessibility-controls>
+  <button class="accessibility-toggle" data-accessibility-toggle aria-label="Open accessibility options">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2zM12 20a8 8 0 1 1 8-8 8.01 8.01 0 0 1-8 8z"/>
+      <path d="M12 6a1.5 1.5 0 1 0 1.5 1.5A1.5 1.5 0 0 0 12 6zM12 10a1 1 0 0 0-1 1v6a1 1 0 0 0 2 0v-6a1 1 0 0 0-1-1z"/>
+    </svg>
+    <span>Accessibility</span>
+  </button>
+  
+  <div class="accessibility-panel" data-accessibility-panel>
+    <div class="accessibility-panel-header">
+      <h3>Customize Your Experience</h3>
+      <button class="accessibility-close" data-accessibility-close aria-label="Close accessibility options">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M15 5L5 15M5 5l10 10"/>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="accessibility-options">
+      <!-- Font Size Control -->
+      <div class="accessibility-option">
+        <label for="font-size-control">Text Size</label>
+        <div class="font-size-controls">
+          <button class="font-size-btn" data-font-size="small" aria-label="Small text">A</button>
+          <button class="font-size-btn active" data-font-size="normal" aria-label="Normal text">A</button>
+          <button class="font-size-btn" data-font-size="large" aria-label="Large text">A</button>
+          <button class="font-size-btn" data-font-size="extra-large" aria-label="Extra large text">A</button>
+        </div>
+      </div>
+      
+      <!-- Contrast Control -->
+      <div class="accessibility-option">
+        <label for="contrast-control">Contrast</label>
+        <div class="contrast-controls">
+          <button class="contrast-btn active" data-contrast="normal">
+            <span class="contrast-preview contrast-preview--normal"></span>
+            Normal
+          </button>
+          <button class="contrast-btn" data-contrast="high">
+            <span class="contrast-preview contrast-preview--high"></span>
+            High
+          </button>
+          <button class="contrast-btn" data-contrast="dark">
+            <span class="contrast-preview contrast-preview--dark"></span>
+            Dark
+          </button>
+        </div>
+      </div>
+      
+      <!-- Cognitive Support -->
+      <div class="accessibility-option">
+        <label>Cognitive Support</label>
+        <div class="cognitive-options">
+          <label class="checkbox-option">
+            <input type="checkbox" data-cognitive="focus-mode">
+            <span class="checkmark"></span>
+            Focus Mode (reduces distractions)
+          </label>
+          <label class="checkbox-option">
+            <input type="checkbox" data-cognitive="reading-guide">
+            <span class="checkmark"></span>
+            Reading Guide
+          </label>
+          <label class="checkbox-option">
+            <input type="checkbox" data-cognitive="simplified-ui">
+            <span class="checkmark"></span>
+            Simplified Interface
+          </label>
+        </div>
+      </div>
+      
+      <!-- Motion Control -->
+      <div class="accessibility-option">
+        <label>Motion & Animation</label>
+        <div class="motion-controls">
+          <label class="checkbox-option">
+            <input type="checkbox" data-motion="reduce-motion">
+            <span class="checkmark"></span>
+            Reduce Motion
+          </label>
+          <label class="checkbox-option">
+            <input type="checkbox" data-motion="pause-autoplay">
+            <span class="checkmark"></span>
+            Pause Auto-playing Content
+          </label>
+        </div>
+      </div>
+      
+      <!-- Reset -->
+      <div class="accessibility-actions">
+        <button class="btn btn--secondary btn--small" data-accessibility-reset>
+          Reset to Default
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+class AccessibilityControls {
+  constructor() {
+    this.settings = JSON.parse(localStorage.getItem('accessibility-settings') || '{}');
+    this.init();
+  }
+
+  init() {
+    this.bindEvents();
+    this.applySettings();
+  }
+
+  bindEvents() {
+    const toggle = document.querySelector('[data-accessibility-toggle]');
+    const panel = document.querySelector('[data-accessibility-panel]');
+    const close = document.querySelector('[data-accessibility-close]');
+    
+    toggle?.addEventListener('click', () => this.togglePanel());
+    close?.addEventListener('click', () => this.closePanel());
+    
+    // Font size controls
+    document.querySelectorAll('[data-font-size]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.setFontSize(e.target.dataset.fontSize);
+      });
+    });
+    
+    // Contrast controls
+    document.querySelectorAll('[data-contrast]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        this.setContrast(e.target.dataset.contrast);
+      });
+    });
+    
+    // Cognitive options
+    document.querySelectorAll('[data-cognitive]').forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        this.setCognitiveOption(e.target.dataset.cognitive, e.target.checked);
+      });
+    });
+    
+    // Motion controls
+    document.querySelectorAll('[data-motion]').forEach(checkbox => {
+      checkbox.addEventListener('change', (e) => {
+        this.setMotionOption(e.target.dataset.motion, e.target.checked);
+      });
+    });
+    
+    // Reset
+    document.querySelector('[data-accessibility-reset]')?.addEventListener('click', () => {
+      this.resetSettings();
+    });
+    
+    // Close on escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && panel?.classList.contains('active')) {
+        this.closePanel();
+      }
+    });
+  }
+
+  togglePanel() {
+    const panel = document.querySelector('[data-accessibility-panel]');
+    panel?.classList.toggle('active');
+  }
+
+  closePanel() {
+    const panel = document.querySelector('[data-accessibility-panel]');
+    panel?.classList.remove('active');
+  }
+
+  setFontSize(size) {
+    this.settings.fontSize = size;
+    this.saveSettings();
+    this.applyFontSize();
+    this.updateActiveButton('[data-font-size]', size);
+  }
+
+  setContrast(contrast) {
+    this.settings.contrast = contrast;
+    this.saveSettings();
+    this.applyContrast();
+    this.updateActiveButton('[data-contrast]', contrast);
+  }
+
+  setCognitiveOption(option, enabled) {
+    if (!this.settings.cognitive) this.settings.cognitive = {};
+    this.settings.cognitive[option] = enabled;
+    this.saveSettings();
+    this.applyCognitiveOptions();
+  }
+
+  setMotionOption(option, enabled) {
+    if (!this.settings.motion) this.settings.motion = {};
+    this.settings.motion[option] = enabled;
+    this.saveSettings();
+    this.applyMotionOptions();
+  }
+
+  applySettings() {
+    this.applyFontSize();
+    this.applyContrast();
+    this.applyCognitiveOptions();
+    this.applyMotionOptions();
+    this.updateUI();
+  }
+
+  applyFontSize() {
+    const size = this.settings.fontSize || 'normal';
+    document.documentElement.setAttribute('data-font-size', size);
+  }
+
+  applyContrast() {
+    const contrast = this.settings.contrast || 'normal';
+    document.documentElement.setAttribute('data-contrast', contrast);
+  }
+
+  applyCognitiveOptions() {
+    const cognitive = this.settings.cognitive || {};
+    
+    Object.keys(cognitive).forEach(option => {
+      document.documentElement.setAttribute(`data-${option}`, cognitive[option]);
+    });
+  }
+
+  applyMotionOptions() {
+    const motion = this.settings.motion || {};
+    
+    Object.keys(motion).forEach(option => {
+      document.documentElement.setAttribute(`data-${option}`, motion[option]);
+    });
+  }
+
+  updateActiveButton(selector, value) {
+    document.querySelectorAll(selector).forEach(btn => {
+      btn.classList.toggle('active', btn.dataset[selector.replace(/[[\]]/g, '').split('-')[1]] === value);
+    });
+  }
+
+  updateUI() {
+    // Update button states
+    if (this.settings.fontSize) {
+      this.updateActiveButton('[data-font-size]', this.settings.fontSize);
+    }
+    if (this.settings.contrast) {
+      this.updateActiveButton('[data-contrast]', this.settings.contrast);
+    }
+    
+    // Update checkboxes
+    if (this.settings.cognitive) {
+      Object.keys(this.settings.cognitive).forEach(option => {
+        const checkbox = document.querySelector(`[data-cognitive="${option}"]`);
+        if (checkbox) checkbox.checked = this.settings.cognitive[option];
+      });
+    }
+    
+    if (this.settings.motion) {
+      Object.keys(this.settings.motion).forEach(option => {
+        const checkbox = document.querySelector(`[data-motion="${option}"]`);
+        if (checkbox) checkbox.checked = this.settings.motion[option];
+      });
+    }
+  }
+
+  resetSettings() {
+    this.settings = {};
+    this.saveSettings();
+    this.applySettings();
+    
+    // Reset UI
+    document.querySelectorAll('.active').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('[data-font-size="normal"]')[0]?.classList.add('active');
+    document.querySelectorAll('[data-contrast="normal"]')[0]?.classList.add('active');
+    document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+  }
+
+  saveSettings() {
+    localStorage.setItem('accessibility-settings', JSON.stringify(this.settings));
+  }
+}
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  new AccessibilityControls();
+});
+</script>
+
+<style>
+.accessibility-controls {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: var(--z-modal);
+}
+
+.accessibility-toggle {
+  background: var(--color-primary);
+  color: var(--color-background);
+  border: none;
+  padding: var(--gap-md);
+  border-radius: var(--border-radius-md) 0 0 var(--border-radius-md);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--gap-xs);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+}
+
+.accessibility-toggle:hover {
+  background: var(--color-primary-hover, var(--color-primary));
+  transform: translateX(-5px);
+}
+
+.accessibility-panel {
+  position: absolute;
+  top: 0;
+  right: 100%;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--gap-lg);
+  min-width: 320px;
+  max-width: 400px;
+  box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2);
+  transform: translateX(20px);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.accessibility-panel.active {
+  transform: translateX(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.accessibility-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--gap-lg);
+  padding-bottom: var(--gap-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.accessibility-panel-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.accessibility-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--gap-sm);
+  color: var(--color-foreground);
+  opacity: 0.7;
+  border-radius: var(--border-radius-sm);
+  transition: all 0.2s ease;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.accessibility-close:hover {
+  opacity: 1;
+  background: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.accessibility-option {
+  margin-bottom: var(--gap-lg);
+}
+
+.accessibility-option label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--gap-sm);
+  color: var(--color-foreground);
+}
+
+.font-size-controls {
+  display: flex;
+  gap: var(--gap-sm);
+}
+
+.font-size-btn {
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  padding: var(--gap-sm);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.font-size-btn[data-font-size="small"] { font-size: 12px; }
+.font-size-btn[data-font-size="normal"] { font-size: 16px; }
+.font-size-btn[data-font-size="large"] { font-size: 20px; }
+.font-size-btn[data-font-size="extra-large"] { font-size: 24px; }
+
+.font-size-btn:hover,
+.font-size-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+.contrast-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.contrast-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  padding: var(--gap-sm);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: var(--touch-target-min);
+}
+
+.contrast-btn:hover,
+.contrast-btn.active {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-background);
+}
+
+.contrast-preview {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.contrast-preview--normal {
+  background: linear-gradient(45deg, #333 50%, #fff 50%);
+}
+
+.contrast-preview--high {
+  background: linear-gradient(45deg, #000 50%, #fff 50%);
+}
+
+.contrast-preview--dark {
+  background: linear-gradient(45deg, #fff 50%, #000 50%);
+}
+
+.cognitive-options,
+.motion-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-sm);
+}
+
+.checkbox-option {
+  display: flex;
+  align-items: center;
+  gap: var(--gap-sm);
+  cursor: pointer;
+  padding: var(--gap-sm);
+  border-radius: var(--border-radius-sm);
+  transition: background-color 0.2s ease;
+  min-height: var(--touch-target-min);
+}
+
+.checkbox-option:hover {
+  background: rgba(var(--color-primary-rgb), 0.1);
+}
+
+.checkbox-option input[type="checkbox"] {
+  opacity: 0;
+  position: absolute;
+}
+
+.checkmark {
+  width: 20px;
+  height: 20px;
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-sm);
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkmark {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.checkbox-option input[type="checkbox"]:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 6px;
+  width: 4px;
+  height: 8px;
+  border: solid var(--color-background);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.accessibility-actions {
+  margin-top: var(--gap-lg);
+  padding-top: var(--gap-md);
+  border-top: 1px solid var(--color-border);
+}
+
+/* Font size variations */
+[data-font-size="small"] {
+  font-size: 14px;
+}
+
+[data-font-size="large"] {
+  font-size: 18px;
+}
+
+[data-font-size="extra-large"] {
+  font-size: 22px;
+}
+
+/* Contrast variations */
+[data-contrast="high"] {
+  --color-foreground: #000000;
+  --color-background: #ffffff;
+  --color-border: #000000;
+}
+
+[data-contrast="dark"] {
+  --color-foreground: #ffffff;
+  --color-background: #000000;
+  --color-border: #ffffff;
+  --color-primary: #ffdd00;
+}
+
+/* Cognitive support modes */
+[data-focus-mode="true"] * {
+  transition: none !important;
+  animation: none !important;
+}
+
+[data-focus-mode="true"] .announcement-bar,
+[data-focus-mode="true"] .promotional-banner,
+[data-focus-mode="true"] .newsletter-popup {
+  display: none !important;
+}
+
+[data-simplified-ui="true"] .secondary-nav,
+[data-simplified-ui="true"] .social-links,
+[data-simplified-ui="true"] .footer-secondary {
+  display: none !important;
+}
+
+[data-reading-guide="true"] {
+  --reading-guide-color: rgba(255, 221, 0, 0.3);
+}
+
+/* Motion preferences */
+[data-reduce-motion="true"] *,
+[data-reduce-motion="true"] *::before,
+[data-reduce-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+[data-pause-autoplay="true"] [autoplay] {
+  animation-play-state: paused !important;
+}
+
+@media (max-width: 768px) {
+  .accessibility-panel {
+    min-width: 280px;
+    max-width: 90vw;
+  }
+  
+  .accessibility-controls {
+    top: auto;
+    bottom: 20px;
+    right: 20px;
+    transform: none;
+  }
+  
+  .accessibility-panel {
+    bottom: 100%;
+    top: auto;
+    right: 0;
+  }
+}
+</style>

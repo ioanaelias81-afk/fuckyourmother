@@ -37,6 +37,10 @@
 
   <body class="page-width-{{ settings.page_width }} card-hover-effect-{{ settings.card_hover_effect }}">
     {% render 'skip-to-content-link', href: '#MainContent', text: 'accessibility.skip_to_text' %}
+    
+    <!-- Neurodiverse Accessibility Controls -->
+    {% render 'accessibility-controls' %}
+    
     <div id="header-group">
       {% sections 'header-group' %}
     </div>
@@ -67,6 +71,10 @@
     <!-- Enhanced CSS for performance and design system -->
     <link rel="stylesheet" href="{{ 'performance.css' | asset_url }}" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="{{ 'performance.css' | asset_url }}"></noscript>
+    
+    <!-- Neurodiverse-friendly enhancements -->
+    <link rel="stylesheet" href="{{ 'neurodiverse-enhancements.css' | asset_url }}" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="{{ 'neurodiverse-enhancements.css' | asset_url }}"></noscript>
 
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}

@@ -1,0 +1,495 @@
+/**
+ * ===== NEURODIVERSE-FRIENDLY ENHANCEMENTS =====
+ * Trauma-informed design patterns and cognitive support
+ */
+
+/* Generous White Space for Cognitive Load Reduction */
+:root {
+  --cognitive-gap-xs: 8px;
+  --cognitive-gap-sm: 16px;
+  --cognitive-gap-md: 24px;
+  --cognitive-gap-lg: 32px;
+  --cognitive-gap-xl: 48px;
+  --cognitive-gap-2xl: 64px;
+  
+  /* Executive Function Support Colors */
+  --color-calm-blue: #e6f3ff;
+  --color-soft-green: #f0f9f0;
+  --color-warm-yellow: #fff8e6;
+  --color-gentle-purple: #f5f0ff;
+  
+  /* Safe Space Indicators */
+  --color-safe-zone: #10b981;
+  --color-progress: #3b82f6;
+  --color-completion: #059669;
+  --color-gentle-warning: #f59e0b;
+}
+
+/* Literal Language and Clear Hierarchy */
+.neuro-friendly-content {
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  word-spacing: 0.1em;
+}
+
+.neuro-friendly-content h1,
+.neuro-friendly-content h2,
+.neuro-friendly-content h3 {
+  margin-bottom: var(--cognitive-gap-md);
+  margin-top: var(--cognitive-gap-lg);
+}
+
+.neuro-friendly-content p {
+  margin-bottom: var(--cognitive-gap-md);
+  max-width: 65ch; /* Optimal reading width */
+}
+
+.neuro-friendly-content ul,
+.neuro-friendly-content ol {
+  margin: var(--cognitive-gap-md) 0;
+  padding-left: var(--cognitive-gap-lg);
+}
+
+.neuro-friendly-content li {
+  margin-bottom: var(--cognitive-gap-sm);
+}
+
+/* Predictable Navigation (7±2 Principle) */
+.neuro-nav {
+  max-width: 100%;
+}
+
+.neuro-nav-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cognitive-gap-md);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.neuro-nav-item {
+  flex: 0 0 auto;
+}
+
+.neuro-nav-link {
+  display: block;
+  padding: var(--cognitive-gap-md) var(--cognitive-gap-lg);
+  background: var(--color-background);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  color: var(--color-foreground);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-height: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.neuro-nav-link:hover,
+.neuro-nav-link:focus {
+  background: var(--color-calm-blue);
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.neuro-nav-link.current {
+  background: var(--color-primary);
+  color: var(--color-background);
+  border-color: var(--color-primary);
+}
+
+/* Trust-Building Elements for Trauma Survivors */
+.trust-indicators {
+  background: var(--color-soft-green);
+  border: 1px solid var(--color-success);
+  border-radius: var(--border-radius-lg);
+  padding: var(--cognitive-gap-xl);
+  margin: var(--cognitive-gap-2xl) 0;
+}
+
+.trust-indicators h3 {
+  color: var(--color-success);
+  margin: 0 0 var(--cognitive-gap-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--cognitive-gap-sm);
+}
+
+.trust-indicators h3::before {
+  content: '🛡️';
+  font-size: var(--font-size-lg);
+}
+
+.trust-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--cognitive-gap-md);
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: var(--cognitive-gap-sm);
+  font-weight: 500;
+}
+
+.trust-item::before {
+  content: '✓';
+  color: var(--color-success);
+  font-weight: bold;
+  font-size: var(--font-size-lg);
+}
+
+/* Anxiety-Reducing Pricing Display */
+.trauma-informed-pricing {
+  background: var(--color-warm-yellow);
+  border: 2px solid var(--color-gentle-warning);
+  border-radius: var(--border-radius-lg);
+  padding: var(--cognitive-gap-xl);
+  margin: var(--cognitive-gap-lg) 0;
+}
+
+.pricing-transparency {
+  margin-bottom: var(--cognitive-gap-lg);
+}
+
+.pricing-transparency h4 {
+  margin: 0 0 var(--cognitive-gap-sm);
+  color: var(--color-foreground);
+  font-size: var(--font-size-lg);
+}
+
+.pricing-breakdown {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pricing-breakdown li {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--cognitive-gap-sm) 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.pricing-breakdown li:last-child {
+  border-bottom: none;
+  font-weight: bold;
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+}
+
+.sliding-scale-option {
+  background: var(--color-gentle-purple);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--border-radius-md);
+  padding: var(--cognitive-gap-lg);
+  margin-top: var(--cognitive-gap-lg);
+}
+
+.sliding-scale-option h5 {
+  margin: 0 0 var(--cognitive-gap-sm);
+  color: var(--color-primary);
+}
+
+.sliding-scale-option p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+/* Digital Product Presentation for Clarity */
+.digital-product-showcase {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--cognitive-gap-xl);
+  margin: var(--cognitive-gap-lg) 0;
+}
+
+.product-mockup-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--cognitive-gap-xl);
+  margin: var(--cognitive-gap-lg) 0;
+}
+
+.mockup-item {
+  text-align: center;
+}
+
+.mockup-image {
+  width: 100%;
+  max-width: 350px;
+  height: auto;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  margin-bottom: var(--cognitive-gap-md);
+}
+
+.mockup-description {
+  font-size: var(--font-size-sm);
+  color: var(--color-foreground);
+  opacity: 0.8;
+  max-width: 40ch;
+  margin: 0 auto;
+}
+
+/* Practical Benefits Language */
+.benefits-list {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--cognitive-gap-xl);
+  margin: var(--cognitive-gap-lg) 0;
+}
+
+.benefits-list h3 {
+  margin: 0 0 var(--cognitive-gap-lg);
+  color: var(--color-foreground);
+  font-size: var(--font-size-xl);
+  text-align: center;
+}
+
+.benefit-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--cognitive-gap-lg);
+}
+
+.benefit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cognitive-gap-md);
+  padding: var(--cognitive-gap-lg);
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-radius: var(--border-radius-md);
+}
+
+.benefit-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--color-primary);
+  color: var(--color-background);
+  border-radius: var(--border-radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-lg);
+  flex-shrink: 0;
+}
+
+.benefit-content h4 {
+  margin: 0 0 var(--cognitive-gap-sm);
+  color: var(--color-foreground);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.benefit-content p {
+  margin: 0;
+  color: var(--color-foreground);
+  opacity: 0.8;
+  line-height: 1.5;
+}
+
+/* Executive Function Support */
+.executive-support-bar {
+  position: sticky;
+  top: 0;
+  background: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--cognitive-gap-md);
+  z-index: var(--z-sticky);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.executive-support-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.location-indicator {
+  font-size: var(--font-size-sm);
+  color: var(--color-foreground);
+  opacity: 0.8;
+}
+
+.completion-status {
+  display: flex;
+  align-items: center;
+  gap: var(--cognitive-gap-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-success);
+}
+
+/* Form Enhancements for ADHD */
+.neuro-friendly-form {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.neuro-friendly-form .form-group {
+  margin-bottom: var(--cognitive-gap-xl);
+}
+
+.neuro-friendly-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: var(--cognitive-gap-sm);
+  color: var(--color-foreground);
+  font-size: var(--font-size-base);
+}
+
+.neuro-friendly-form input,
+.neuro-friendly-form textarea,
+.neuro-friendly-form select {
+  width: 100%;
+  padding: var(--cognitive-gap-md);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-size: var(--font-size-base);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  transition: border-color 0.2s ease;
+}
+
+.neuro-friendly-form input:focus,
+.neuro-friendly-form textarea:focus,
+.neuro-friendly-form select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+}
+
+.form-help-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-foreground);
+  opacity: 0.7;
+  margin-top: var(--cognitive-gap-xs);
+  line-height: 1.4;
+}
+
+.required-indicator {
+  color: var(--color-error, #ef4444);
+  margin-left: var(--cognitive-gap-xs);
+}
+
+/* Sensory Considerations */
+.reduced-motion * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+.high-contrast {
+  filter: contrast(1.5);
+}
+
+.focus-mode {
+  background: var(--color-background) !important;
+}
+
+.focus-mode .announcement-bar,
+.focus-mode .promotional-content,
+.focus-mode .newsletter-popup {
+  display: none !important;
+}
+
+/* Reading Support */
+.reading-guide {
+  position: relative;
+}
+
+.reading-guide::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10px;
+  right: -10px;
+  height: 1.5em;
+  background: var(--reading-guide-color, rgba(255, 221, 0, 0.3));
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Mobile Neurodiverse Optimizations */
+@media (max-width: 768px) {
+  .neuro-nav-list {
+    flex-direction: column;
+    gap: var(--cognitive-gap-sm);
+  }
+  
+  .neuro-nav-link {
+    padding: var(--cognitive-gap-lg);
+    font-size: var(--font-size-base);
+  }
+  
+  .product-mockup-grid {
+    grid-template-columns: 1fr;
+    gap: var(--cognitive-gap-lg);
+  }
+  
+  .benefit-items {
+    gap: var(--cognitive-gap-md);
+  }
+  
+  .benefit-item {
+    padding: var(--cognitive-gap-md);
+  }
+  
+  .executive-support-content {
+    flex-direction: column;
+    gap: var(--cognitive-gap-sm);
+    text-align: center;
+  }
+}
+
+/* Print Styles for Digital Planners */
+@media print {
+  .digital-product-showcase,
+  .benefits-list,
+  .trust-indicators {
+    break-inside: avoid;
+    margin: var(--cognitive-gap-lg) 0;
+  }
+  
+  .mockup-image {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Dark Mode Considerations */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-calm-blue: #1e3a8a;
+    --color-soft-green: #064e3b;
+    --color-warm-yellow: #92400e;
+    --color-gentle-purple: #581c87;
+  }
+}
+
+/* Reduced Motion Preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

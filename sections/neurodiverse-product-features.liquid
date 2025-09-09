@@ -1,0 +1,251 @@
+{% comment %}
+  Neurodiverse-Friendly Product Features
+  Trauma-informed design for digital planners with executive function support
+{% endcomment %}
+
+{% liquid
+  assign product = section.settings.product | default: product
+  assign current_variant = product.selected_or_first_available_variant
+  assign benefits_list = section.settings.benefits | split: '|'
+%}
+
+<div class="neurodiverse-product-section">
+  <!-- Executive Function Support Bar -->
+  <div class="executive-support-bar">
+    <div class="executive-support-content">
+      <div class="location-indicator">
+        {% render 'breadcrumbs' %}
+      </div>
+      <div class="completion-status">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm3.78-9.72a.75.75 0 0 0-1.06-1.06L6.75 9.19 5.28 7.72a.75.75 0 0 0-1.06 1.06l2 2a.75.75 0 0 0 1.06 0l4.5-4.5z"/>
+        </svg>
+        Safe space for exploring
+      </div>
+    </div>
+  </div>
+
+  <!-- Trust Indicators for Trauma Survivors -->
+  <div class="trust-indicators">
+    <h3>Your Peace of Mind Matters</h3>
+    <ul class="trust-list">
+      <li class="trust-item">30-day money-back guarantee - no questions asked</li>
+      <li class="trust-item">Instant download - no waiting or uncertainty</li>
+      <li class="trust-item">Multiple format options for your preferences</li>
+      <li class="trust-item">Lifetime access - download as many times as you need</li>
+      <li class="trust-item">Secure payment processing with 256-bit encryption</li>
+      <li class="trust-item">No spam - we respect your inbox and boundaries</li>
+    </ul>
+  </div>
+
+  <!-- Clear Digital Product Showcase -->
+  <div class="digital-product-showcase neuro-friendly-content">
+    <h2>What You'll Actually Get</h2>
+    <p>Here's exactly what's included in your digital planner - no hidden surprises:</p>
+    
+    <div class="product-mockup-grid">
+      {% if product.images.size > 0 %}
+        {% for image in product.images limit: 4 %}
+          <div class="mockup-item">
+            {% render 'image', 
+              image: image, 
+              class: 'mockup-image',
+              height: 400,
+              loading: 'lazy' %}
+            <div class="mockup-description">
+              {{ image.alt | default: 'Digital planner preview showing actual pages and functionality' }}
+            </div>
+          </div>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Practical Benefits in Literal Language -->
+  <div class="benefits-list neuro-friendly-content">
+    <h3>How This Actually Helps Your Daily Life</h3>
+    <ul class="benefit-items">
+      <li class="benefit-item">
+        <div class="benefit-icon">🧠</div>
+        <div class="benefit-content">
+          <h4>Reduces Decision Fatigue</h4>
+          <p>Pre-designed layouts mean you don't have to think about formatting. Just open and start writing your thoughts.</p>
+        </div>
+      </li>
+      
+      <li class="benefit-item">
+        <div class="benefit-icon">📱</div>
+        <div class="benefit-content">
+          <h4>Works on Any Device</h4>
+          <p>Use on your phone during commutes, tablet at home, or computer at work. Syncs across all your devices automatically.</p>
+        </div>
+      </li>
+      
+      <li class="benefit-item">
+        <div class="benefit-icon">⏰</div>
+        <div class="benefit-content">
+          <h4>Saves 15 Minutes Daily</h4>
+          <p>No more staring at blank pages wondering what to write. Prompts and structure guide you to start immediately.</p>
+        </div>
+      </li>
+      
+      <li class="benefit-item">
+        <div class="benefit-icon">🔒</div>
+        <div class="benefit-content">
+          <h4>Private and Secure</h4>
+          <p>Your thoughts stay on your device. No cloud storage requirements, no data sharing, no privacy concerns.</p>
+        </div>
+      </li>
+      
+      {% if benefits_list.size > 0 %}
+        {% for benefit in benefits_list %}
+          {% assign benefit_parts = benefit | split: ':' %}
+          <li class="benefit-item">
+            <div class="benefit-icon">✨</div>
+            <div class="benefit-content">
+              <h4>{{ benefit_parts[0] | strip }}</h4>
+              <p>{{ benefit_parts[1] | strip | default: benefit }}</p>
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </div>
+
+  <!-- Trauma-Informed Pricing -->
+  <div class="trauma-informed-pricing neuro-friendly-content">
+    <div class="pricing-transparency">
+      <h4>Complete Price Breakdown</h4>
+      <ul class="pricing-breakdown">
+        <li>
+          <span>Digital Planner Files</span>
+          <span>{{ current_variant.price | money }}</span>
+        </li>
+        <li>
+          <span>Instant Download Access</span>
+          <span>Included</span>
+        </li>
+        <li>
+          <span>Email Support</span>
+          <span>Included</span>
+        </li>
+        <li>
+          <span>Future Updates</span>
+          <span>Included</span>
+        </li>
+        <li>
+          <span>Total Today</span>
+          <span>{{ current_variant.price | money }}</span>
+        </li>
+      </ul>
+    </div>
+
+    {% if section.settings.sliding_scale_enabled %}
+      <div class="sliding-scale-option">
+        <h5>Need Financial Assistance?</h5>
+        <p>We believe everyone deserves access to tools that help their mental health and productivity. If you're experiencing financial hardship, please email us for sliding scale pricing options. No proof required - we trust you to know your situation.</p>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Executive Function Progress Support -->
+  {% render 'executive-function-support' %}
+
+  <!-- Clear Next Steps -->
+  <div class="next-steps neuro-friendly-content">
+    <h3>What Happens After You Buy</h3>
+    <ol class="step-list">
+      <li>
+        <strong>Instant Email:</strong> You'll receive a download link within 2 minutes of purchase
+      </li>
+      <li>
+        <strong>Download Files:</strong> Click the link to download your planner files (no account needed)
+      </li>
+      <li>
+        <strong>Import to Your App:</strong> Open in your favorite note-taking app (we include instructions for 5 popular apps)
+      </li>
+      <li>
+        <strong>Start Planning:</strong> Begin using immediately - no setup or learning curve required
+      </li>
+    </ol>
+  </div>
+</div>
+
+<style>
+.neurodiverse-product-section {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--cognitive-gap-lg);
+}
+
+.step-list {
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--cognitive-gap-xl);
+  margin: var(--cognitive-gap-lg) 0;
+}
+
+.step-list li {
+  margin-bottom: var(--cognitive-gap-lg);
+  padding: var(--cognitive-gap-md);
+  background: rgba(var(--color-primary-rgb), 0.05);
+  border-radius: var(--border-radius-md);
+  line-height: 1.5;
+}
+
+.step-list li:last-child {
+  margin-bottom: 0;
+}
+
+.step-list strong {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.next-steps {
+  margin-top: var(--cognitive-gap-2xl);
+}
+
+.next-steps h3 {
+  text-align: center;
+  color: var(--color-foreground);
+  margin-bottom: var(--cognitive-gap-xl);
+}
+
+@media (max-width: 768px) {
+  .neurodiverse-product-section {
+    padding: var(--cognitive-gap-md);
+  }
+  
+  .executive-support-bar {
+    position: relative;
+    top: auto;
+  }
+}
+</style>
+
+{% schema %}
+{
+  "name": "Neurodiverse Product Features",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "textarea",
+      "id": "benefits",
+      "label": "Additional Benefits",
+      "info": "Enter benefits separated by | in format: Title:Description"
+    },
+    {
+      "type": "checkbox",
+      "id": "sliding_scale_enabled",
+      "label": "Enable sliding scale pricing option",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
