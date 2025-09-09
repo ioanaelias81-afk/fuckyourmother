@@ -115,29 +115,34 @@ class EnhancedPredictiveSearch {
   displayResults(data, query) {
     const content = this.searchResults.querySelector('[data-search-content]');
     
-    let resultsHTML = '';
+    // Clear existing content safely
+    content.textContent = '';
+
+    let hasResults = false;
 
     // Products
     if (data.resources.results.products.length > 0) {
-      resultsHTML += this.renderProducts(data.resources.results.products);
+      content.appendChild(this.renderProducts(data.resources.results.products));
+      hasResults = true;
     }
 
     // Collections
     if (data.resources.results.collections.length > 0) {
-      resultsHTML += this.renderCollections(data.resources.results.collections);
+      content.appendChild(this.renderCollections(data.resources.results.collections));
+      hasResults = true;
     }
 
     // Articles
     if (data.resources.results.articles.length > 0) {
-      resultsHTML += this.renderArticles(data.resources.results.articles);
+      content.appendChild(this.renderArticles(data.resources.results.articles));
+      hasResults = true;
     }
 
     // No results
-    if (!resultsHTML) {
-      resultsHTML = this.renderNoResults(query);
+    if (!hasResults) {
+      content.appendChild(this.renderNoResults(query));
     }
 
-    content.innerHTML = resultsHTML;
     this.showResults();
     
     // Add "View all results" link
@@ -145,84 +150,172 @@ class EnhancedPredictiveSearch {
   }
 
   renderProducts(products) {
-    return `
-      <div class="search-section">
-        <h3 class="search-section-title">Products</h3>
-        <div class="search-products">
-          ${products.map(product => `
-            <a href="${product.url}" class="search-product-item">
-              <div class="search-product-image">
-                <img src="${product.featured_image?.url || ''}" alt="${product.title}" loading="lazy">
-              </div>
-              <div class="search-product-content">
-                <h4 class="search-product-title">${product.title}</h4>
-                <div class="search-product-price">${this.formatPrice(product.price)}</div>
-              </div>
-            </a>
-          `).join('')}
-        </div>
-      </div>
-    `;
+    const section = document.createElement('div');
+    section.className = 'search-section';
+    
+    const title = document.createElement('h3');
+    title.className = 'search-section-title';
+    title.textContent = 'Products';
+    section.appendChild(title);
+    
+    const container = document.createElement('div');
+    container.className = 'search-products';
+    
+    products.forEach(product => {
+      const item = document.createElement('a');
+      item.href = product.url;
+      item.className = 'search-product-item';
+      
+      const imageDiv = document.createElement('div');
+      imageDiv.className = 'search-product-image';
+      const img = document.createElement('img');
+      img.src = product.featured_image?.url || '';
+      img.alt = product.title; // Safe: alt attribute is escaped by browser
+      img.loading = 'lazy';
+      imageDiv.appendChild(img);
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'search-product-content';
+      
+      const titleEl = document.createElement('h4');
+      titleEl.className = 'search-product-title';
+      titleEl.textContent = product.title; // Safe: textContent prevents XSS
+      
+      const priceEl = document.createElement('div');
+      priceEl.className = 'search-product-price';
+      priceEl.textContent = this.formatPrice(product.price); // Safe: formatted price
+      
+      contentDiv.appendChild(titleEl);
+      contentDiv.appendChild(priceEl);
+      
+      item.appendChild(imageDiv);
+      item.appendChild(contentDiv);
+      container.appendChild(item);
+    });
+    
+    section.appendChild(container);
+    return section;
   }
 
   renderCollections(collections) {
-    return `
-      <div class="search-section">
-        <h3 class="search-section-title">Collections</h3>
-        <div class="search-collections">
-          ${collections.map(collection => `
-            <a href="${collection.url}" class="search-collection-item">
-              <div class="search-collection-image">
-                <img src="${collection.featured_image?.url || ''}" alt="${collection.title}" loading="lazy">
-              </div>
-              <div class="search-collection-content">
-                <h4 class="search-collection-title">${collection.title}</h4>
-                <p class="search-collection-count">${collection.products_count || 0} products</p>
-              </div>
-            </a>
-          `).join('')}
-        </div>
-      </div>
-    `;
+    const section = document.createElement('div');
+    section.className = 'search-section';
+    
+    const title = document.createElement('h3');
+    title.className = 'search-section-title';
+    title.textContent = 'Collections';
+    section.appendChild(title);
+    
+    const container = document.createElement('div');
+    container.className = 'search-collections';
+    
+    collections.forEach(collection => {
+      const item = document.createElement('a');
+      item.href = collection.url;
+      item.className = 'search-collection-item';
+      
+      const imageDiv = document.createElement('div');
+      imageDiv.className = 'search-collection-image';
+      const img = document.createElement('img');
+      img.src = collection.featured_image?.url || '';
+      img.alt = collection.title; // Safe: alt attribute is escaped by browser
+      img.loading = 'lazy';
+      imageDiv.appendChild(img);
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'search-collection-content';
+      
+      const titleEl = document.createElement('h4');
+      titleEl.className = 'search-collection-title';
+      titleEl.textContent = collection.title; // Safe: textContent prevents XSS
+      
+      const countEl = document.createElement('p');
+      countEl.className = 'search-collection-count';
+      countEl.textContent = `${collection.products_count || 0} products`; // Safe: number + text
+      
+      contentDiv.appendChild(titleEl);
+      contentDiv.appendChild(countEl);
+      
+      item.appendChild(imageDiv);
+      item.appendChild(contentDiv);
+      container.appendChild(item);
+    });
+    
+    section.appendChild(container);
+    return section;
   }
 
   renderArticles(articles) {
-    return `
-      <div class="search-section">
-        <h3 class="search-section-title">Articles</h3>
-        <div class="search-articles">
-          ${articles.map(article => `
-            <a href="${article.url}" class="search-article-item">
-              <h4 class="search-article-title">${article.title}</h4>
-              <p class="search-article-summary">${article.summary || ''}</p>
-            </a>
-          `).join('')}
-        </div>
-      </div>
-    `;
+    const section = document.createElement('div');
+    section.className = 'search-section';
+    
+    const title = document.createElement('h3');
+    title.className = 'search-section-title';
+    title.textContent = 'Articles';
+    section.appendChild(title);
+    
+    const container = document.createElement('div');
+    container.className = 'search-articles';
+    
+    articles.forEach(article => {
+      const item = document.createElement('a');
+      item.href = article.url;
+      item.className = 'search-article-item';
+      
+      const titleEl = document.createElement('h4');
+      titleEl.className = 'search-article-title';
+      titleEl.textContent = article.title; // Safe: textContent prevents XSS
+      
+      const summaryEl = document.createElement('p');
+      summaryEl.className = 'search-article-summary';
+      summaryEl.textContent = article.summary || ''; // Safe: textContent prevents XSS
+      
+      item.appendChild(titleEl);
+      item.appendChild(summaryEl);
+      container.appendChild(item);
+    });
+    
+    section.appendChild(container);
+    return section;
   }
 
   renderNoResults(query) {
-    return `
-      <div class="search-no-results">
-        <h3>No results found for "${query}"</h3>
-        <p>Try searching for something else or browse our collections</p>
-        <div class="search-suggestions-fallback">
-          <a href="/collections" class="btn btn--secondary">Browse Collections</a>
-        </div>
-      </div>
-    `;
+    const container = document.createElement('div');
+    container.className = 'search-no-results';
+    
+    const title = document.createElement('h3');
+    title.textContent = `No results found for "${query}"`; // Safe: textContent prevents XSS
+    
+    const message = document.createElement('p');
+    message.textContent = 'Try searching for something else or browse our collections';
+    
+    const suggestions = document.createElement('div');
+    suggestions.className = 'search-suggestions-fallback';
+    
+    const browseLink = document.createElement('a');
+    browseLink.href = '/collections';
+    browseLink.className = 'btn btn--secondary';
+    browseLink.textContent = 'Browse Collections';
+    
+    suggestions.appendChild(browseLink);
+    container.appendChild(title);
+    container.appendChild(message);
+    container.appendChild(suggestions);
+    
+    return container;
   }
 
   addViewAllLink(query) {
     const content = this.searchResults.querySelector('[data-search-content]');
     const viewAllLink = document.createElement('div');
     viewAllLink.className = 'search-view-all';
-    viewAllLink.innerHTML = `
-      <a href="/search?q=${encodeURIComponent(query)}" class="search-view-all-link">
-        View all results for "${query}" →
-      </a>
-    `;
+    
+    const link = document.createElement('a');
+    link.href = `/search?q=${encodeURIComponent(query)}`; // Safe: URL encoding
+    link.className = 'search-view-all-link';
+    link.textContent = `View all results for "${query}" →`; // Safe: textContent prevents XSS
+    
+    viewAllLink.appendChild(link);
     content.appendChild(viewAllLink);
   }
 
