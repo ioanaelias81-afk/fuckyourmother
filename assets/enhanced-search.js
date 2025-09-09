@@ -25,6 +25,7 @@ class EnhancedPredictiveSearch {
   bindEvents() {
     // Enhanced search input with debouncing
     this.searchInput.addEventListener('input', (e) => {
+      if (!(e.target instanceof HTMLInputElement)) return;
       const query = e.target.value.trim();
       
       clearTimeout(this.debounceTimer);
@@ -40,7 +41,7 @@ class EnhancedPredictiveSearch {
 
     // Click outside to close
     document.addEventListener('click', (e) => {
-      if (!e.target.closest('[data-search-container]')) {
+      if (!(e.target instanceof Element) || !e.target.closest('[data-search-container]')) {
         this.hideResults();
       }
     });
@@ -48,7 +49,7 @@ class EnhancedPredictiveSearch {
     // Search form submission tracking
     if (this.searchForm) {
       this.searchForm.addEventListener('submit', (e) => {
-        const query = this.searchInput.value.trim();
+        const query = this.searchInput?.value?.trim() || '';
         if (query) {
           this.addToSearchHistory(query);
         }
@@ -78,7 +79,7 @@ class EnhancedPredictiveSearch {
       <div class="search-results-content" data-search-content></div>
     `;
     
-    this.searchInput.parentNode.appendChild(container);
+    this.searchInput.parentNode?.appendChild(container);
     this.searchResults = container;
   }
 
@@ -113,7 +114,8 @@ class EnhancedPredictiveSearch {
   }
 
   displayResults(data, query) {
-    const content = this.searchResults.querySelector('[data-search-content]');
+    const content = this.searchResults?.querySelector('[data-search-content]');
+    if (!content) return;
     
     // Clear existing content safely
     content.textContent = '';
@@ -121,19 +123,19 @@ class EnhancedPredictiveSearch {
     let hasResults = false;
 
     // Products
-    if (data.resources.results.products.length > 0) {
+    if (data?.resources?.results?.products?.length > 0) {
       content.appendChild(this.renderProducts(data.resources.results.products));
       hasResults = true;
     }
 
     // Collections
-    if (data.resources.results.collections.length > 0) {
+    if (data?.resources?.results?.collections?.length > 0) {
       content.appendChild(this.renderCollections(data.resources.results.collections));
       hasResults = true;
     }
 
     // Articles
-    if (data.resources.results.articles.length > 0) {
+    if (data?.resources?.results?.articles?.length > 0) {
       content.appendChild(this.renderArticles(data.resources.results.articles));
       hasResults = true;
     }
@@ -306,7 +308,8 @@ class EnhancedPredictiveSearch {
   }
 
   addViewAllLink(query) {
-    const content = this.searchResults.querySelector('[data-search-content]');
+    const content = this.searchResults?.querySelector('[data-search-content]');
+    if (!content) return;
     const viewAllLink = document.createElement('div');
     viewAllLink.className = 'search-view-all';
     
@@ -316,20 +319,21 @@ class EnhancedPredictiveSearch {
     link.textContent = `View all results for "${query}" →`; // Safe: textContent prevents XSS
     
     viewAllLink.appendChild(link);
-    content.appendChild(viewAllLink);
+    if (content) content.appendChild(viewAllLink);
   }
 
   showSuggestions() {
-    const suggestions = this.searchResults.querySelector('[data-search-suggestions]');
-    const content = this.searchResults.querySelector('[data-search-content]');
+    const suggestions = this.searchResults?.querySelector('[data-search-suggestions]');
+    const content = this.searchResults?.querySelector('[data-search-content]');
     
-    suggestions.style.display = 'block';
-    content.style.display = 'none';
-    this.searchResults.classList.add('predictive-search-results--show');
+    if (suggestions instanceof HTMLElement) suggestions.style.display = 'block';
+    if (content instanceof HTMLElement) content.style.display = 'none';
+    this.searchResults?.classList.add('predictive-search-results--show');
   }
 
   showLoading() {
-    const content = this.searchResults.querySelector('[data-search-content]');
+    const content = this.searchResults?.querySelector('[data-search-content]');
+    if (!content) return;
     content.innerHTML = `
       <div class="search-loading">
         <div class="search-loading-spinner"></div>
@@ -340,22 +344,24 @@ class EnhancedPredictiveSearch {
   }
 
   showResults() {
-    const suggestions = this.searchResults.querySelector('[data-search-suggestions]');
-    const content = this.searchResults.querySelector('[data-search-content]');
+    const suggestions = this.searchResults?.querySelector('[data-search-suggestions]');
+    const content = this.searchResults?.querySelector('[data-search-content]');
     
-    suggestions.style.display = 'none';
-    content.style.display = 'block';
-    this.searchResults.classList.add('predictive-search-results--show');
+    if (suggestions instanceof HTMLElement) suggestions.style.display = 'none';
+    if (content instanceof HTMLElement) content.style.display = 'block';
+    this.searchResults?.classList.add('predictive-search-results--show');
   }
 
   hideResults() {
-    this.searchResults.classList.remove('predictive-search-results--show');
+    this.searchResults?.classList.remove('predictive-search-results--show');
     this.currentQuery = '';
   }
 
   addSearchSuggestions() {
-    const recent = this.searchResults.querySelector('[data-search-recent]');
-    const popular = this.searchResults.querySelector('[data-search-popular]');
+    const recent = this.searchResults?.querySelector('[data-search-recent]');
+    const popular = this.searchResults?.querySelector('[data-search-popular]');
+    
+    if (!recent || !popular) return;
     
     // Recent searches
     if (this.searchHistory.length > 0) {
@@ -366,7 +372,8 @@ class EnhancedPredictiveSearch {
       `;
       
       const historyContainer = recent.querySelector('.search-history');
-      this.searchHistory.slice(0, 5).forEach(term => {
+      if (!historyContainer) return;
+      this.searchHistory.slice(0, 5).forEach((term) => {
         const button = document.createElement('button');
         button.className = 'search-history-item';
         button.setAttribute('data-search-term', term);
@@ -393,7 +400,8 @@ class EnhancedPredictiveSearch {
     `;
     
     const termsContainer = popular.querySelector('.search-popular-terms');
-    popularTerms.forEach(term => {
+    if (!termsContainer) return;
+    popularTerms.forEach((term) => {
       const button = document.createElement('button');
       button.className = 'search-popular-item';
       button.setAttribute('data-search-term', term);
@@ -402,19 +410,20 @@ class EnhancedPredictiveSearch {
     });
 
     // Bind suggestion clicks
-    this.searchResults.addEventListener('click', (e) => {
+    this.searchResults?.addEventListener('click', (e) => {
+      if (!(e.target instanceof Element)) return;
       const searchTerm = e.target.closest('[data-search-term]');
-      if (searchTerm) {
+      if (searchTerm instanceof HTMLElement && searchTerm.dataset.searchTerm) {
         e.preventDefault();
         const term = searchTerm.dataset.searchTerm;
-        this.searchInput.value = term;
+        if (this.searchInput) this.searchInput.value = term;
         this.handleSearch(term);
       }
     });
   }
 
   addToSearchHistory(query) {
-    this.searchHistory = this.searchHistory.filter(term => term !== query);
+    this.searchHistory = this.searchHistory.filter((term) => term !== query);
     this.searchHistory.unshift(query);
     this.searchHistory = this.searchHistory.slice(0, 10);
     localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
@@ -429,10 +438,11 @@ class EnhancedPredictiveSearch {
   }
 
   formatPrice(price) {
+    const numPrice = typeof price === 'number' ? price : parseFloat(price) || 0;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
-    }).format(price / 100);
+    }).format(numPrice / 100);
   }
 }
 
