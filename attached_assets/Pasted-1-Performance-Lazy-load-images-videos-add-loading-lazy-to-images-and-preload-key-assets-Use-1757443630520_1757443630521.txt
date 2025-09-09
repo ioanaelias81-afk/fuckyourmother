@@ -1,0 +1,106 @@
+1. Performance
+
+Lazy-load images & videos: add loading="lazy" to images and preload key assets.
+
+Use modern image formats: WebP/AVIF with Shopify’s | image_url filter.
+
+Reduce JS weight: only load scripts where needed (don’t drop all scripts globally).
+
+Critical CSS: inline above-the-fold styles for speed.
+
+2. Design Consistency
+
+Build a design system in your theme:
+
+Consistent spacing tokens (--gap-xs, --gap-md, --gap-lg).
+
+Typography scale (--font-size-sm, --font-size-lg, etc.).
+
+Global color scheme variables (--color-primary, --color-secondary).
+
+3. Mobile-First UX
+
+Sticky Add to Cart bar on mobile product pages.
+
+Swipeable carousels (with proper dots/arrows).
+
+Buttons large enough for thumb taps (min 44px height).
+
+4. Product Page Conversions
+
+Add trust badges (shipping, returns, secure checkout).
+
+Tabs or accordions for product details → keeps the page clean.
+
+Rich product media gallery (zoom, video, 3D model support).
+
+Social proof: star ratings, reviews, and UGC (user-generated content).
+
+5. Navigation & Discovery
+
+Mega menu with featured collections/products.
+
+Smart search with predictive results (“search as you type”).
+
+Breadcrumbs for better SEO and navigation.
+
+6. Accessibility (a11y)
+
+Ensure every image has meaningful alt text.
+
+Keyboard navigable menus/drawers.
+
+High color contrast for text/background.
+
+ARIA labels for custom components (sliders, modals).
+
+7. SEO & Marketing
+
+Structured data (JSON-LD for products, breadcrumbs, articles).
+
+Auto-generated meta titles & descriptions with Liquid fallbacks.
+
+Blog/article sections for content marketing.
+
+Collection filters with crawlable links.
+
+8. Customization & Flexibility
+
+Add global section padding controls (top/bottom).
+
+Add per-section color scheme toggles (light/dark).
+
+Allow merchants (you) to set custom IDs/anchors for deep links.
+
+Add rich blocks: text, image, video, buttons that can be reordered.
+
+9. Checkout & Cart
+
+Cart drawer with upsells/cross-sells (“You may also like”).
+
+Free shipping progress bar in cart.
+
+One-click discount code input at checkout.
+
+Express checkout buttons (Shop Pay, Apple Pay, Google Pay).
+
+10. Growth Tools
+
+Newsletter signup with incentive (discount, freebie).
+
+Social proof widgets (“X people bought this today”).
+
+Back-in-stock email capture for sold-out products.
+
+Wishlist functionality.
+
+⚡️ Big picture:
+Your theme should feel modular, fast, and conversion-focused — not just “pretty.” Every section should have:
+
+Design control (spacing, alignment, colors).
+
+Content flexibility (text/image/video blocks).
+
+A11y baked in.
+
+Performance-minded defaults.
