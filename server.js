@@ -107,7 +107,12 @@ app.get('/', (req, res) => {
             </div>
         </div>
         
-        <script src="/assets/component.js"></script>
+        <!-- JavaScript modules are handled by Shopify in production -->
+        <script>
+          console.log('Dwell Theme Development Server Ready');
+          // Theme JavaScript files use ES6 modules and are intended for Shopify's platform
+          // In development mode, we're focusing on file structure and asset serving
+        </script>
     </body>
     </html>
   `);
