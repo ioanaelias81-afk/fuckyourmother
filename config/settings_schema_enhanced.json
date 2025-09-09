@@ -1,0 +1,463 @@
+[
+  {
+    "name": "theme_info",
+    "theme_name": "Dwell",
+    "theme_version": "2.0.0",
+    "theme_author": "Shopify",
+    "theme_documentation_url": "",
+    "theme_support_url": ""
+  },
+  {
+    "name": "Accessibility & Neurodiversity",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Accessibility Features"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_accessibility_controls",
+        "label": "Enable accessibility controls",
+        "info": "Shows accessibility options button for users to customize their experience",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_skip_links",
+        "label": "Enable skip links",
+        "info": "Adds keyboard navigation skip links for screen readers",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "focus_style",
+        "label": "Focus indicator style",
+        "options": [
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "enhanced",
+            "label": "Enhanced (recommended)"
+          },
+          {
+            "value": "custom",
+            "label": "Custom color"
+          }
+        ],
+        "default": "enhanced"
+      },
+      {
+        "type": "color",
+        "id": "focus_color",
+        "label": "Custom focus color",
+        "default": "#005fcc",
+        "info": "Must meet WCAG contrast requirements"
+      },
+      {
+        "type": "header",
+        "content": "Neurodivergent-Friendly Options"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_reduced_motion_default",
+        "label": "Reduce motion by default",
+        "info": "Minimizes animations and transitions for all users",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "animation_speed_multiplier",
+        "min": 0.1,
+        "max": 2.0,
+        "step": 0.1,
+        "unit": "x",
+        "label": "Animation speed multiplier",
+        "default": 1.0,
+        "info": "Adjust animation speeds (0.1 = very slow, 2.0 = very fast)"
+      },
+      {
+        "type": "select",
+        "id": "cognitive_load_level",
+        "label": "Cognitive load level",
+        "options": [
+          {
+            "value": "minimal",
+            "label": "Minimal (fewer elements, more white space)"
+          },
+          {
+            "value": "standard",
+            "label": "Standard"
+          },
+          {
+            "value": "rich",
+            "label": "Rich (more visual elements)"
+          }
+        ],
+        "default": "standard"
+      }
+    ]
+  },
+  {
+    "name": "Performance",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Image Optimization"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_lazy_loading",
+        "label": "Enable lazy loading",
+        "info": "Loads images only when they come into view",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_responsive_images",
+        "label": "Enable responsive images",
+        "info": "Serves appropriately sized images for each device",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "image_format_preference",
+        "label": "Preferred image format",
+        "options": [
+          {
+            "value": "auto",
+            "label": "Auto (browser chooses best)"
+          },
+          {
+            "value": "webp",
+            "label": "WebP preferred"
+          },
+          {
+            "value": "jpg",
+            "label": "JPEG preferred"
+          }
+        ],
+        "default": "auto"
+      },
+      {
+        "type": "header",
+        "content": "Script Loading"
+      },
+      {
+        "type": "checkbox",
+        "id": "defer_non_critical_js",
+        "label": "Defer non-critical JavaScript",
+        "info": "Improves initial page load speed",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_critical_css",
+        "label": "Inline critical CSS",
+        "info": "Inlines above-the-fold styles for faster rendering",
+        "default": false
+      },
+      {
+        "type": "header",
+        "content": "Performance Monitoring"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_performance_monitoring",
+        "label": "Enable performance monitoring",
+        "info": "Tracks Core Web Vitals and performance metrics",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "performance_analytics_endpoint",
+        "label": "Performance analytics endpoint",
+        "info": "Optional: URL to send performance data"
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Color Schemes"
+      },
+      {
+        "type": "color_scheme_group",
+        "id": "color_schemes",
+        "label": "Color schemes"
+      },
+      {
+        "type": "header",
+        "content": "Accessibility Colors"
+      },
+      {
+        "type": "color",
+        "id": "error_color",
+        "label": "Error color",
+        "default": "#dc3545",
+        "info": "Must have 4.5:1 contrast ratio with background"
+      },
+      {
+        "type": "color",
+        "id": "success_color",
+        "label": "Success color",
+        "default": "#28a745",
+        "info": "Must have 4.5:1 contrast ratio with background"
+      },
+      {
+        "type": "color",
+        "id": "warning_color",
+        "label": "Warning color",
+        "default": "#ffc107",
+        "info": "Must have 4.5:1 contrast ratio with background"
+      },
+      {
+        "type": "color",
+        "id": "info_color",
+        "label": "Info color",
+        "default": "#17a2b8",
+        "info": "Must have 4.5:1 contrast ratio with background"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Font Settings"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_header_font",
+        "default": "assistant_n4",
+        "label": "Heading font",
+        "info": "Choose a font that's easy to read"
+      },
+      {
+        "type": "font_picker",
+        "id": "type_body_font",
+        "default": "assistant_n4",
+        "label": "Body font",
+        "info": "Should be highly legible for extended reading"
+      },
+      {
+        "type": "header",
+        "content": "Accessibility Typography"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_dyslexia_friendly_font",
+        "label": "Enable dyslexia-friendly font option",
+        "info": "Allows users to switch to fonts optimized for dyslexic readers",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "base_font_size",
+        "min": 14,
+        "max": 20,
+        "step": 1,
+        "unit": "px",
+        "label": "Base font size",
+        "default": 16,
+        "info": "Larger sizes improve readability"
+      },
+      {
+        "type": "range",
+        "id": "line_height_multiplier",
+        "min": 1.2,
+        "max": 2.0,
+        "step": 0.1,
+        "label": "Line height multiplier",
+        "default": 1.5,
+        "info": "Higher values improve readability for dyslexic users"
+      },
+      {
+        "type": "range",
+        "id": "letter_spacing",
+        "min": 0,
+        "max": 0.2,
+        "step": 0.01,
+        "unit": "em",
+        "label": "Letter spacing",
+        "default": 0,
+        "info": "Slight letter spacing can help dyslexic readers"
+      }
+    ]
+  },
+  {
+    "name": "User Experience",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Navigation"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_breadcrumbs",
+        "label": "Enable breadcrumb navigation",
+        "info": "Helps users understand their location in the site",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "menu_style",
+        "label": "Main menu style",
+        "options": [
+          {
+            "value": "simple",
+            "label": "Simple dropdown"
+          },
+          {
+            "value": "mega",
+            "label": "Mega menu"
+          },
+          {
+            "value": "sidebar",
+            "label": "Sidebar navigation"
+          }
+        ],
+        "default": "simple"
+      },
+      {
+        "type": "header",
+        "content": "Search & Discovery"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_predictive_search",
+        "label": "Enable predictive search",
+        "info": "Shows search suggestions as users type",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_search_filters",
+        "label": "Enable search filters",
+        "info": "Allows users to filter search results",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_recently_viewed",
+        "label": "Enable recently viewed products",
+        "info": "Shows products the user has recently looked at",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Progressive Disclosure"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_product_details_accordion",
+        "label": "Use accordion for product details",
+        "info": "Reduces cognitive load by hiding secondary information",
+        "default": false
+      },
+      {
+        "type": "range",
+        "id": "products_per_page",
+        "min": 8,
+        "max": 50,
+        "step": 4,
+        "label": "Products per page",
+        "default": 16,
+        "info": "Fewer products reduce cognitive load"
+      }
+    ]
+  },
+  {
+    "name": "Mobile Experience",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Touch Targets"
+      },
+      {
+        "type": "range",
+        "id": "min_touch_target_size",
+        "min": 44,
+        "max": 60,
+        "step": 2,
+        "unit": "px",
+        "label": "Minimum touch target size",
+        "default": 44,
+        "info": "WCAG 2.2 recommends minimum 44px"
+      },
+      {
+        "type": "header",
+        "content": "Mobile Navigation"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_sticky_mobile_cart",
+        "label": "Enable sticky mobile cart bar",
+        "info": "Shows add to cart button when scrolling on product pages",
+        "default": true
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_swipe_gestures",
+        "label": "Enable swipe gestures",
+        "info": "Allows swiping through product images and carousels",
+        "default": true
+      }
+    ]
+  },
+  {
+    "name": "Content Management",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Metafields"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_product_metafields",
+        "label": "Enable product metafields",
+        "info": "Shows additional product information from metafields",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "product_metafield_namespaces",
+        "label": "Product metafield namespaces",
+        "default": "custom.specifications,custom.care_instructions",
+        "info": "Comma-separated list of metafield namespaces to display"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_collection_metafields",
+        "label": "Enable collection metafields",
+        "info": "Shows additional collection information from metafields",
+        "default": true
+      },
+      {
+        "type": "header",
+        "content": "Personalization"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_personalized_recommendations",
+        "label": "Enable personalized product recommendations",
+        "info": "Shows recommended products based on browsing history",
+        "default": true
+      },
+      {
+        "type": "range",
+        "id": "max_recommendations",
+        "min": 3,
+        "max": 12,
+        "step": 1,
+        "label": "Maximum recommendations to show",
+        "default": 6,
+        "info": "Fewer recommendations reduce decision paralysis"
+      }
+    ]
+  }
+]

@@ -1,0 +1,101 @@
+{%- doc -%}
+  Performance-optimized image rendering with lazy loading, responsive images, and accessibility
+  
+  @param {object} image - image object
+  @param {number} [width] - custom image width
+  @param {number} [height] - custom image height  
+  @param {string} [sizes] - sizes attribute for responsive images
+  @param {string} [class] - additional classes
+  @param {string} [alt] - alt text (required for accessibility)
+  @param {boolean} [lazy] - enable lazy loading (default: true)
+  @param {boolean} [priority] - high priority loading for above-fold images
+  @param {string} [style] - additional styles
+  
+  @example
+  {% render 'image-optimized', 
+     image: product.featured_image, 
+     width: 800, 
+     alt: product.title,
+     sizes: '(min-width: 750px) 50vw, 100vw' %}
+{%- enddoc -%}
+
+{%- liquid
+  # Set defaults
+  assign lazy_loading = lazy | default: true
+  assign image_priority = priority | default: false
+  assign image_width = width | default: image.width
+  assign image_height = height | default: image.height
+  
+  # Disable lazy loading for priority images
+  if image_priority
+    assign lazy_loading = false
+  endif
+  
+  # Default sizes for responsive images
+  unless sizes
+    assign sizes = '(min-width: 750px) 50vw, 100vw'
+  endunless
+  
+  # Generate responsive image URLs
+  assign image_widths = '180,360,540,720,900,1080,1296,1512,1728,1944,2160,2376,2592,2808,3024' | split: ','
+  
+  # Build srcset for responsive images
+  assign srcset_parts = ''
+  for width_str in image_widths
+    assign current_width = width_str | plus: 0
+    if current_width <= image.width
+      if srcset_parts != blank
+        assign srcset_parts = srcset_parts | append: ', '
+      endif
+      assign url = image | image_url: width: current_width
+      assign srcset_parts = srcset_parts | append: url | append: ' ' | append: current_width | append: 'w'
+    endif
+  endfor
+-%}
+
+{%- if image != blank -%}
+  {%- # Generate optimized image tag -%}
+  {%- assign image_attributes = '' -%}
+  
+  {%- # Add class -%}
+  {%- if class -%}
+    {%- assign image_attributes = image_attributes | append: ' class="' | append: class | append: '"' -%}
+  {%- endif -%}
+  
+  {%- # Add style -%}
+  {%- if style -%}
+    {%- assign image_attributes = image_attributes | append: ' style="' | append: style | append: '"' -%}
+  {%- endif -%}
+  
+  {%- # Add loading attribute -%}
+  {%- if lazy_loading -%}
+    {%- assign image_attributes = image_attributes | append: ' loading="lazy"' -%}
+  {%- else -%}
+    {%- assign image_attributes = image_attributes | append: ' loading="eager"' -%}
+  {%- endif -%}
+  
+  {%- # Add fetchpriority for critical images -%}
+  {%- if image_priority -%}
+    {%- assign image_attributes = image_attributes | append: ' fetchpriority="high"' -%}
+  {%- endif -%}
+  
+  {%- # Add decoding attribute -%}
+  {%- if lazy_loading -%}
+    {%- assign image_attributes = image_attributes | append: ' decoding="async"' -%}
+  {%- else -%}
+    {%- assign image_attributes = image_attributes | append: ' decoding="sync"' -%}
+  {%- endif -%}
+  
+  <img 
+    src="{{ image | image_url: width: image_width }}"
+    {%- if srcset_parts != blank %} srcset="{{ srcset_parts }}"{% endif %}
+    {%- if sizes %} sizes="{{ sizes }}"{% endif %}
+    {%- if image_width %} width="{{ image_width }}"{% endif %}
+    {%- if image_height %} height="{{ image_height }}"{% endif %}
+    alt="{{ alt | default: image.alt | escape }}"
+    {{ image_attributes }}
+  >
+{%- elsif alt -%}
+  {%- # Provide text fallback if image is missing -%}
+  <div class="image-fallback">{{ alt }}</div>
+{%- endif -%}
