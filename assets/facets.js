@@ -593,7 +593,7 @@ class FacetStatusComponent extends Component {
     facetStatus.classList.remove('bubble', 'facets__bubble');
 
     if (checkedInputElementsCount === 0) {
-      facetStatus.innerHTML = '';
+      facetStatus.textContent = '';
       return;
     }
 
@@ -617,13 +617,13 @@ class FacetStatusComponent extends Component {
     const { facetStatus } = this.refs;
 
     if (!minInputValue && !maxInputValue) {
-      facetStatus.innerHTML = '';
+      facetStatus.textContent = '';
       return;
     }
 
     const minInputNum = this.#parseCents(minInputValue, '0');
     const maxInputNum = this.#parseCents(maxInputValue, facetStatus.dataset.rangeMax);
-    facetStatus.innerHTML = `${this.#formatMoney(minInputNum)}–${this.#formatMoney(maxInputNum)}`;
+    facetStatus.textContent = `${this.#formatMoney(minInputNum)}–${this.#formatMoney(maxInputNum)}`;
   }
 
   /**
@@ -721,7 +721,7 @@ class FacetStatusComponent extends Component {
    * Clears the summary
    */
   clearSummary() {
-    this.refs.facetStatus.innerHTML = '';
+    this.refs.facetStatus.textContent = '';
   }
 }
 
