@@ -85,7 +85,8 @@ class MobileUXEnhancer {
     if (!mainPrice || !stickyPrice) return;
 
     const updateStickyPrice = () => {
-      stickyPrice.innerHTML = mainPrice.innerHTML;
+      // Safely clone the price structure instead of using innerHTML
+      stickyPrice.replaceChildren(...Array.from(mainPrice.childNodes).map(node => node.cloneNode(true)));
     };
 
     // Initial sync
