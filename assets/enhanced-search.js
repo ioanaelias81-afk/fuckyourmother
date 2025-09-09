@@ -384,16 +384,22 @@ class EnhancedPredictiveSearch {
     }
 
     // Popular searches (hardcoded for demo, could be dynamic)
+    const popularTerms = ['new arrivals', 'bestsellers', 'sale', 'accessories'];
+    
+    // Create container structure safely
     popular.innerHTML = `
       <h3>Popular Searches</h3>
-      <div class="search-popular-terms">
-        ${['new arrivals', 'bestsellers', 'sale', 'accessories'].map(term => `
-          <button class="search-popular-item" data-search-term="${term}">
-            ${term}
-          </button>
-        `).join('')}
-      </div>
+      <div class="search-popular-terms"></div>
     `;
+    
+    const termsContainer = popular.querySelector('.search-popular-terms');
+    popularTerms.forEach(term => {
+      const button = document.createElement('button');
+      button.className = 'search-popular-item';
+      button.setAttribute('data-search-term', term);
+      button.textContent = term;
+      termsContainer.appendChild(button);
+    });
 
     // Bind suggestion clicks
     this.searchResults.addEventListener('click', (e) => {
