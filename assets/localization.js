@@ -218,35 +218,52 @@ class LocalizationFormComponent extends Component {
   }
 
   /**
-   * Highlights matching text in a string by wrapping it in <mark> tags.
+   * Highlights matching text by creating safe DOM elements.
    *
-   * @param {string | null} text - The text to highlight.
+   * @param {HTMLElement} element - The element to highlight text in.
+   * @param {string} text - The text to highlight.
    * @param {string} searchValue - The search value to highlight.
-   * @returns {string} The text with matching parts wrapped in <mark> tags.
    */
-  #highlightMatches(text, searchValue) {
-    if (!text || !searchValue) return text ?? '';
+  #highlightMatches(element, text, searchValue) {
+    if (!text || !searchValue) {
+      element.textContent = text ?? '';
+      return;
+    }
 
     const normalizedText = normalizeString(text);
     const normalizedSearch = normalizeString(searchValue);
     const startIndex = normalizedText.indexOf(normalizedSearch);
 
-    if (startIndex === -1) return text;
+    if (startIndex === -1) {
+      element.textContent = text;
+      return;
+    }
+
+    // Clear existing content
+    element.innerHTML = '';
 
     const endIndex = startIndex + normalizedSearch.length;
     const before = text.slice(0, startIndex);
     const match = text.slice(startIndex, endIndex);
     const after = text.slice(endIndex);
 
-    let result = '';
+    // Create safe DOM elements
     if (before) {
-      result += `<mark>${before}</mark>`;
+      const beforeMark = document.createElement('mark');
+      beforeMark.textContent = before;
+      element.appendChild(beforeMark);
     }
-    result += match;
+    
+    if (match) {
+      const matchText = document.createTextNode(match);
+      element.appendChild(matchText);
+    }
+    
     if (after) {
-      result += `<mark>${after}</mark>`;
+      const afterMark = document.createElement('mark');
+      afterMark.textContent = after;
+      element.appendChild(afterMark);
     }
-    return result;
   }
 
   /**
@@ -285,8 +302,8 @@ class LocalizationFormComponent extends Component {
         if (matches.label || matches.alias || matches.iso || matches.currency) {
           countryEl.removeAttribute('hidden');
           const countrySpan = countryEl.querySelector('.country');
-          if (countrySpan) {
-            countrySpan.innerHTML = this.#highlightMatches(countrySpan.textContent, searchValue);
+          if (countrySpan instanceof HTMLElement) {
+            this.#highlightMatches(countrySpan, countrySpan.textContent || '', searchValue);
           }
           countVisibleCountries++;
         } else {
