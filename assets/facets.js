@@ -570,12 +570,17 @@ class FacetStatusComponent extends Component {
       return;
     }
 
-    facetStatus.innerHTML = Array.from(checkedInputElements)
-      .map((inputElement) => {
-        const swatch = inputElement.parentElement?.querySelector('span.swatch');
-        return swatch?.outerHTML ?? '';
-      })
-      .join('');
+    // Clear existing content
+    facetStatus.textContent = '';
+    
+    // Clone and append swatch elements safely
+    Array.from(checkedInputElements).forEach((inputElement) => {
+      const swatch = inputElement.parentElement?.querySelector('span.swatch');
+      if (swatch) {
+        const clonedSwatch = swatch.cloneNode(true);
+        facetStatus.appendChild(clonedSwatch);
+      }
+    });
   }
 
   /**
